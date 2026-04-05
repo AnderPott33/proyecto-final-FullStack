@@ -12,6 +12,8 @@ import { FaLocationPinLock } from "react-icons/fa6";
 import { FaMoneyBillWheat, FaArrowDownAZ } from "react-icons/fa6";
 import { RiFileSearchFill, RiCoinsLine, RiBankLine, RiDatabaseLine  } from "react-icons/ri";
 import { TbTagStarred } from "react-icons/tb";
+import { MdKeyboardReturn } from "react-icons/md";
+import { AiOutlineFileSearch } from "react-icons/ai";
 
 export default function Sidebar() {
   const navigate = useNavigate();
@@ -47,8 +49,8 @@ export default function Sidebar() {
         {
           title: "Informes",
           items: [
-            { name: "Analítico", icon: <RiFileSearchFill />, path: "/cuenta/informe/analitico" },
-            { name: "Saldos", icon: <FaDollarSign />, path: "/cuenta/informe/saldos" }
+            { name: "Analítico Cuenta", icon: <RiFileSearchFill />, path: "/cuenta/informe/analitico" },
+            { name: "Saldos Cuentas", icon: <FaDollarSign />, path: "/cuenta/informe/saldos" }
           ]
         }
       ]
@@ -96,16 +98,16 @@ export default function Sidebar() {
           title: "Ventas",
           items: [
             { name: "Nueva Venta", icon: <GrMoney  />, path: "/comercial/ventas/registrarVenta" },
-            { name: "Devolución Venta", icon: <FaCartPlus  />, path: "/comercial/ventas/devolucionVenta" },
-            { name: "Consultar Ventas", icon: <GrMoney  />, path: "/comercial/ventas/consultar" },
+            { name: "Devolución Venta", icon: <MdKeyboardReturn  />, path: "/comercial/ventas/devolucionVenta" },
+            { name: "Consultar Ventas", icon: <AiOutlineFileSearch  />, path: "/comercial/ventas/consultar" },
           ]
         },
         {
           title: "Compras",
           items: [
             { name: "Nueva Compra", icon: <FaCartPlus  />, path: "/comercial/compras/registrarCompra" },
-            { name: "Devolución Compra", icon: <FaCartPlus  />, path: "/comercial/compras/devolucionCompra" },
-            { name: "Consultar Compras", icon: <FaCartPlus  />, path: "/comercial/compras/consultar" },
+            { name: "Devolución Compra", icon: <MdKeyboardReturn  />, path: "/comercial/compras/devolucionCompra" },
+            { name: "Consultar Compras", icon: <AiOutlineFileSearch  />, path: "/comercial/compras/consultar" },
           ]
         },
       ]

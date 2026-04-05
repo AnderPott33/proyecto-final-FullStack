@@ -10,6 +10,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function Articulo() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("articulos")
@@ -69,7 +70,7 @@ const tienePermiso = puedeAcceder("articulos")
         const buscarCategoria = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const result = await axios.get(`http://localhost:5000/api/categorias/`,
+                const result = await axios.get(`${API}/api/categorias/`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
                 setCategorias(result.data)
@@ -84,7 +85,7 @@ const tienePermiso = puedeAcceder("articulos")
         const buscarMarca = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const result = await axios.get(`http://localhost:5000/api/marcas/`,
+                const result = await axios.get(`${API}/api/marcas/`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
                 setMarcas(result.data)
@@ -101,7 +102,7 @@ const tienePermiso = puedeAcceder("articulos")
             try {
                 const token = localStorage.getItem("token");
 
-                const result = await axios.get(`http://localhost:5000/api/articulo`,
+                const result = await axios.get(`${API}/api/articulo`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
                 setArticulo(result.data);
@@ -118,7 +119,7 @@ const tienePermiso = puedeAcceder("articulos")
             try {
                 const token = localStorage.getItem("token");
 
-                const result = await axios.get(`http://localhost:5000/api/entidad`,
+                const result = await axios.get(`${API}/api/entidad`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
                 setEntidad(result.data);
@@ -138,7 +139,7 @@ const tienePermiso = puedeAcceder("articulos")
                 try {
                     const token = localStorage.getItem("token");
 
-                    const result = await axios.get(`http://localhost:5000/api/articulo/${articuloSelect}`,
+                    const result = await axios.get(`${API}/api/articulo/${articuloSelect}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
 
@@ -185,7 +186,7 @@ const tienePermiso = puedeAcceder("articulos")
                     const token = localStorage.getItem("token");
 
                     const result = await axios.get(
-                        `http://localhost:5000/api/stock/${articuloSelect}`,
+                        `${API}/api/stock/${articuloSelect}`,
                         {
                             params: { fechaInicio, fechaFin },
                             headers: { Authorization: `Bearer ${token}` }
@@ -217,7 +218,7 @@ const tienePermiso = puedeAcceder("articulos")
                     const token = localStorage.getItem("token");
                     if (articuloSelect) {
 
-                        const result = await axios.put(`http://localhost:5000/api/articulo/actualizarArticulo/${articuloSelect}`,
+                        const result = await axios.put(`${API}/api/articulo/actualizarArticulo/${articuloSelect}`,
                             formData,
                             { headers: { Authorization: `Bearer ${token}` } }
                         )
@@ -236,7 +237,7 @@ const tienePermiso = puedeAcceder("articulos")
                             },
                         });
                     } else {
-                        const result = await axios.post(`http://localhost:5000/api/articulo/nuevoArticulo`,
+                        const result = await axios.post(`${API}/api/articulo/nuevoArticulo`,
                             formData,
                             { headers: { Authorization: `Bearer ${token}` } }
                         )
@@ -277,7 +278,7 @@ const tienePermiso = puedeAcceder("articulos")
             };
 
             const result = await axios.post(
-                `http://localhost:5000/api/stock/nuevoAjuste`,
+                `${API}/api/stock/nuevoAjuste`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

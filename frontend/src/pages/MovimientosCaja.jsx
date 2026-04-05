@@ -12,6 +12,7 @@ import { FaMoneyBillWheat } from "react-icons/fa6";
 import { usePermiso } from "../hooks/usePermiso";
 
 export default function MovimientosCaja() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate();
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("movimientos_caja")
@@ -39,7 +40,7 @@ const tienePermiso = puedeAcceder("movimientos_caja")
     const encontformaPago = async () => {
         try {
             const token = localStorage.getItem("token");
-            const res = await axios.get('http://localhost:5000/api/formaPago', {
+            const res = await axios.get(`${API}/api/formaPago`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             return res.data || [];
@@ -63,7 +64,7 @@ const tienePermiso = puedeAcceder("movimientos_caja")
         try {
             const token = localStorage.getItem("token");
             const res = await axios.post(
-                "http://localhost:5000/api/cuenta/formaPago2",
+                `${API}/api/cuenta/formaPago2`,
                 { nombre: formaPagoId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -99,7 +100,7 @@ const tienePermiso = puedeAcceder("movimientos_caja")
             setCargandoMov(true);
             const token = localStorage.getItem("token");
 
-            const res = await axios.get("http://localhost:5000/api/caja/registros/", {
+            const res = await axios.get(`${API}/api/caja/registros/`, {
                 params: { caja: caja.id, formaPago: formaPagoId },
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -249,7 +250,7 @@ const tienePermiso = puedeAcceder("movimientos_caja")
         const token = localStorage.getItem("token");
 
         await axios.post(
-            `http://localhost:5000/api/caja/registrarMovimiento`,
+            `${API}/api/caja/registrarMovimiento`,
             {
                 caja_id: caja.id,
                 tipo: tipo,

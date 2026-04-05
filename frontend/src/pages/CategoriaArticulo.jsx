@@ -9,6 +9,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from 'react-router-dom'
 
 export default function CategoriaArticulo() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("categorias")
@@ -32,7 +33,7 @@ const tienePermiso = puedeAcceder("categorias")
     const cargarCategorias = async () => {
         try {
             const token = localStorage.getItem('token');
-            const result = await axios.get(`http://localhost:5000/api/categorias/`, {
+            const result = await axios.get(`${API}/api/categorias/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCategorias(result.data);
@@ -53,7 +54,7 @@ const tienePermiso = puedeAcceder("categorias")
                 try {
                     const token = localStorage.getItem("token");
 
-                    const result = await axios.get(`http://localhost:5000/api/stock/categoria/${categoriaSelect}`,
+                    const result = await axios.get(`${API}/api/stock/categoria/${categoriaSelect}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
                     setArticulo(result.data);
@@ -75,7 +76,7 @@ const tienePermiso = puedeAcceder("categorias")
                 try {
                     const token = localStorage.getItem("token");
 
-                    const result = await axios.get(`http://localhost:5000/api/categorias/${categoriaSelect}`,
+                    const result = await axios.get(`${API}/api/categorias/${categoriaSelect}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
 
@@ -102,7 +103,7 @@ const tienePermiso = puedeAcceder("categorias")
                 const token = localStorage.getItem("token");
                 if (categoriaSelect) {
 
-                    const result = await axios.put(`http://localhost:5000/api/categorias/editarCategoria/${categoriaSelect}`,
+                    const result = await axios.put(`${API}/api/categorias/editarCategoria/${categoriaSelect}`,
                         formData,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
@@ -123,7 +124,7 @@ const tienePermiso = puedeAcceder("categorias")
                         },
                     });
                 } else {
-                    const result = await axios.post(`http://localhost:5000/api/categorias/nuevaCategoria`,
+                    const result = await axios.post(`${API}/api/categorias/nuevaCategoria`,
                         formData,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
@@ -168,7 +169,7 @@ const tienePermiso = puedeAcceder("categorias")
             });
 
             if (result.isConfirmed) {
-                await axios.delete(`http://localhost:5000/api/categorias/deletarCategoria/${categoriaSelect}`, {
+                await axios.delete(`${API}/api/categorias/deletarCategoria/${categoriaSelect}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

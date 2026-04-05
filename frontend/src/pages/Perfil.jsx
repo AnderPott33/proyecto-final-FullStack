@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { FaUser, FaSave } from "react-icons/fa";
 
 export default function PerfilUsuario() {
+  const API = import.meta.env.VITE_API_URL;
   const { usuario, actualizarUsuario } = useContext(AuthContext);
   const [form, setForm] = useState({
     nombre: "",
@@ -41,7 +42,7 @@ console.log(usuario);
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:5000/api/auth/${usuario.id}`,
+        `${API}/api/auth/${usuario.id}`,
         form,
         { headers: { Authorization: `Bearer ${token}` } }
       );

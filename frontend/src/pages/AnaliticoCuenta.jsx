@@ -10,6 +10,7 @@ import { FaMagnifyingGlassArrowRight } from "react-icons/fa6";
 import { usePermiso } from "../hooks/usePermiso";
 
 export default function AnaliticoCuenta() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("analitico");
@@ -30,7 +31,7 @@ const tienePermiso = puedeAcceder("analitico");
   const obtenerCuentas = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/cuenta", {
+      const res = await axios.get(`${API}/api/cuenta`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data || [];
@@ -58,7 +59,7 @@ const tienePermiso = puedeAcceder("analitico");
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        "http://localhost:5000/api/cuenta/analitico", // URL
+        `${API}/api/cuenta/analitico`, // URL
         { cuentaId: cuentaSelect, fechaInicio, fechaFin }, // cuerpo del POST
         { headers: { Authorization: `Bearer ${token}` } } // headers correctos
       );

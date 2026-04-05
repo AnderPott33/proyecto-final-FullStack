@@ -11,6 +11,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function SaldosCuentas() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("saldos_cuentas")
@@ -31,7 +32,7 @@ const tienePermiso = puedeAcceder("saldos_cuentas")
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        "http://localhost:5000/api/cuenta/saldos",
+        `${API}/api/cuenta/saldos`,
         {}, // si tu endpoint POST no requiere body, envía un objeto vacío
         {
           headers: { Authorization: `Bearer ${token}` },

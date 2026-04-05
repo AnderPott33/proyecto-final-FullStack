@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { GrMoney } from "react-icons/gr";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
-import { MdCleaningServices } from "react-icons/md";
+import { MdKeyboardReturn } from "react-icons/md";
 import SelectCustom from "../components/SelectCustom";
 import DataTable from "../components/DataTable";
 import { formatearNumero, formatearNumeroSimple } from "../components/FormatoFV";
@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
 export default function DevolucionVenta() {
+    const API = import.meta.env.VITE_API_URL;
     const [modalOpen, setModalOpen] = useState(false)
     const [editandoId, setEditandoId] = useState(null);
     const [filtroTexto, setFiltroTexto] = useState("");
@@ -75,7 +76,7 @@ export default function DevolucionVenta() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/ventas/`, {
+            const result = await axios.get(`${API}/api/ventas/`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setComprasList(result.data.filter(f => f.tipo === 'VENTA'));
@@ -94,7 +95,7 @@ export default function DevolucionVenta() {
         setLoading(true)
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/ventas/nuevaSeqVenta/${timbrado}`, {
+            const result = await axios.get(`${API}/api/ventas/nuevaSeqVenta/${timbrado}`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setFormEncabezado(prev => ({
@@ -121,7 +122,7 @@ export default function DevolucionVenta() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/ventas/buscarVentasYDevoluciones`, {
+            const result = await axios.get(`${API}/api/ventas/buscarVentasYDevoluciones`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             const mapa = {};
@@ -205,7 +206,7 @@ export default function DevolucionVenta() {
     const buscarCuentas = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/cuenta/`,
+            const result = await axios.get(`${API}/api/cuenta/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaCuentas(result.data);
         } catch (error) {
@@ -220,7 +221,7 @@ export default function DevolucionVenta() {
     const buscarFormasPago = async (e) => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/formaPago/`,
+            const result = await axios.get(`${API}/api/formaPago/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaFormaPago(result.data);
 
@@ -237,7 +238,7 @@ export default function DevolucionVenta() {
     const buscarArticulos = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/articulo`,
+            const result = await axios.get(`${API}/api/articulo`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setArticulos(result.data);
@@ -251,32 +252,7 @@ export default function DevolucionVenta() {
         buscarArticulos();
     }, [])
 
-  /*   useEffect(() => {
-        if (articuloSelect) {
-            const buscarArticulosId = async () => {
-                const token = localStorage.getItem("token");
-                try {
-                    const result = await axios.get(`http://localhost:5000/api/articulo/${articuloSelect}`,
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    )
-
-                    setDetalle({
-                        producto_id: result.data[0].id,
-                        producto_nombre: result.data[0].nombre_articulo,
-                        impuesto_por: result.data[0].tipo_impuesto,
-                        impuesto: result.data[0].impuesto,
-                        cantidad: 1
-                    })
-
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-            buscarArticulosId()
-        }
-    }, [articuloSelect]) */
-
-      const agregarDetalle = () => {
+    const agregarDetalle = () => {
         if (!detalle.producto_id || detalle.cantidad <= 0) {
             alert("Completa los datos");
             return;
@@ -323,7 +299,7 @@ export default function DevolucionVenta() {
 
         setArticuloSelect();
     };
-        const editarItem = (row) => {
+    const editarItem = (row) => {
         setDetalle({
             producto_id: row.producto_id,
             producto_nombre: row.producto_nombre,
@@ -341,7 +317,7 @@ export default function DevolucionVenta() {
             document.getElementById("inputCantidad")?.focus();
         }, 100);
     };
-        useEffect(() => {
+    useEffect(() => {
         const handleModalKey = (e) => {
             if (e.key === "F2") {
                 setModalOpen(true);
@@ -357,7 +333,7 @@ export default function DevolucionVenta() {
             const token = localStorage.getItem("token");
 
             const result = await axios.get(
-                `http://localhost:5000/api/articulo/${row.id}`,
+                `${API}/api/articulo/${row.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -551,7 +527,7 @@ export default function DevolucionVenta() {
     const buscarEntidad = async () => {
         try {
             const token = localStorage.getItem("token");
-            const { data } = await axios.get(`http://localhost:5000/api/entidad`, {
+            const { data } = await axios.get(`${API}/api/entidad`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEntidad(data);
@@ -570,7 +546,7 @@ export default function DevolucionVenta() {
                 const token = localStorage.getItem("token");
                 try {
                     const result = await axios.get(
-                        `http://localhost:5000/api/compras/devolver/${formEncabezado.referencia_id}`,
+                        `${API}/api/compras/devolver/${formEncabezado.referencia_id}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
 
@@ -630,106 +606,109 @@ export default function DevolucionVenta() {
         if (loading) return
         setLoading(true)
         try {
-
-            // Validar que haya cliente, artículos y pagos
-            if (!entidadSelect) {
-                Swal.fire("Error", "Selecciona un proveedor", "error");
-                return;
-            }
-            if (itemsLista.length === 0) {
-                Swal.fire("Error", "Agrega al menos un artículo", "error");
-                return;
-            }
-            if (itemsPago.length === 0) {
-                Swal.fire("Error", "Agrega al menos un pago", "error");
-                return;
-            }
-            Swal.fire({
-                title: "Procesando nota de crédito...",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
+            if (timbrado) {
+                // Validar que haya cliente, artículos y pagos
+                if (!entidadSelect) {
+                    Swal.fire("Error", "Selecciona un proveedor", "error");
+                    return;
                 }
-            });
+                if (itemsLista.length === 0) {
+                    Swal.fire("Error", "Agrega al menos un artículo", "error");
+                    return;
+                }
+                if (itemsPago.length === 0) {
+                    Swal.fire("Error", "Agrega al menos un pago", "error");
+                    return;
+                }
+                Swal.fire({
+                    title: "Procesando nota de crédito...",
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
 
-            const referenciaId = formEncabezado.referencia_id;
-            if (referenciaId) {
-                const ventaOriginal = comprasList.find(c => c.id === referenciaId);
-                if (ventaOriginal) {
-                    const totalDevuelto = devolucionesAnt[referenciaId] || 0;
-                    const disponible = Number(ventaOriginal.total_detalle) - totalDevuelto;
+                const referenciaId = formEncabezado.referencia_id;
+                if (referenciaId) {
+                    const ventaOriginal = comprasList.find(c => c.id === referenciaId);
+                    if (ventaOriginal) {
+                        const totalDevuelto = devolucionesAnt[referenciaId] || 0;
+                        const disponible = Number(ventaOriginal.total_detalle) - totalDevuelto;
 
-                    if (totalGeneral > disponible) {
-                        Swal.fire(
-                            "Error",
-                            `El monto de la devolución (${formatearNumero(totalGeneral)}) excede lo disponible (${formatearNumero(disponible)})`,
-                            "error"
-                        );
-                        return; // 🔹 salir sin guardar
+                        if (totalGeneral > disponible) {
+                            Swal.fire(
+                                "Error",
+                                `El monto de la devolución (${formatearNumero(totalGeneral)}) excede lo disponible (${formatearNumero(disponible)})`,
+                                "error"
+                            );
+                            return; // 🔹 salir sin guardar
+                        }
                     }
                 }
-            }
 
-            // Construir el payload
-            const payload = {
-                encabezado: {
-                    ...formEncabezado,
-                    entidad_id: entidadSelect, // asignar el cliente seleccionado
-                    usuario_id: usuario.id,
-                },
-                detalle: itemsLista.map(item => ({
-                    producto_id: item.producto_id,
-                    cantidad: item.cantidad,
-                    precio_unitario: item.total / item.cantidad,
-                    impuesto_por: item.impuesto_por,
-                    impuesto: item.impuesto,
-                    total: item.total
-                })),
-                pagos: itemsPago.map(p => ({
-                    fecha_pago: p.fecha_pago,
-                    moneda: p.moneda,
-                    cuenta_id: p.cuenta_id,
-                    forma_pago: p.forma_pago,
-                    monto: p.monto,
-                    banco: p.banco,
-                    numero_cheque: p.numero_cheque
-                }))
-            };
+                // Construir el payload
+                const payload = {
+                    encabezado: {
+                        ...formEncabezado,
+                        entidad_id: entidadSelect, // asignar el cliente seleccionado
+                        usuario_id: usuario.id,
+                    },
+                    detalle: itemsLista.map(item => ({
+                        producto_id: item.producto_id,
+                        cantidad: item.cantidad,
+                        precio_unitario: item.total / item.cantidad,
+                        impuesto_por: item.impuesto_por,
+                        impuesto: item.impuesto,
+                        total: item.total
+                    })),
+                    pagos: itemsPago.map(p => ({
+                        fecha_pago: p.fecha_pago,
+                        moneda: p.moneda,
+                        cuenta_id: p.cuenta_id,
+                        forma_pago: p.forma_pago,
+                        monto: p.monto,
+                        banco: p.banco,
+                        numero_cheque: p.numero_cheque
+                    }))
+                };
 
-            try {
-                const token = localStorage.getItem("token");
-                const response = await axios.post(
-                    "http://localhost:5000/api/ventas/nuevaDevolucionVenta",
-                    payload,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
+                try {
+                    const token = localStorage.getItem("token");
+                    const response = await axios.post(
+                        `${API}/api/ventas/nuevaDevolucionVenta`,
+                        payload,
+                        { headers: { Authorization: `Bearer ${token}` } }
+                    );
 
-                Swal.fire("Éxito", "La Nota Crédito fue registrada correctamente", "success");
+                    Swal.fire("Éxito", "La Nota Crédito fue registrada correctamente", "success");
 
-                // Limpiar formularios y estados
-                setItemsLista([]);
-                setItemsPago([]);
-                setFormEncabezado({
-                    ...formEncabezado,
-                    entidad_id: null,
-                    condicion_pago: "CONTADO",
-                    observacion: "",
-                    numero_factura: "", // incrementar o generar dinámicamente
-                    timbrado: "", // incrementar o generar dinámicamente
-                    referencia_id: ""
-                });
-                /*             buscarNuevaSeqVenta(); */
-                setEntidadSelect();
-                setRegistro("active");
-                setMovimientos("");
-                setPagoVenta("");
-                buscarCompras();
-                buscarNuevaSeqVenta()
+                    // Limpiar formularios y estados
+                    setItemsLista([]);
+                    setItemsPago([]);
+                    setFormEncabezado({
+                        ...formEncabezado,
+                        entidad_id: null,
+                        condicion_pago: "CONTADO",
+                        observacion: "",
+                        numero_factura: "", // incrementar o generar dinámicamente
+                        timbrado: "", // incrementar o generar dinámicamente
+                        referencia_id: ""
+                    });
+                    /*             buscarNuevaSeqVenta(); */
+                    setEntidadSelect();
+                    setRegistro("active");
+                    setMovimientos("");
+                    setPagoVenta("");
+                    buscarCompras();
+                    buscarNuevaSeqVenta()
 
-            } catch (error) {
-                console.error(error);
-                Swal.fire("Error", "No se pudo registrar la nota de crédito", "error");
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire("Error", "No se pudo registrar la nota de crédito", "error");
+                }
+            } else {
+                Swal.fire("Atención", "No podes guardar la venta porque no tenes timbrado habilitado!", "error");
             }
         } catch {
             Swal.fire("Error", "No se pudo registrar la nota de crédito", "error");
@@ -766,7 +745,7 @@ export default function DevolucionVenta() {
                         rounded-md p-6 md:p-8 shadow-lg shadow-gray-300/30">
                     <div>
                         <h1 className="text-2xl md:text-3xl flex gap-2 font-bold text-white tracking-wide">
-                            <GrMoney />
+                            <MdKeyboardReturn />
                             Nueva Nota Crédita Emitida
                         </h1>
                         <p className="text-white/90 text-sm md:text-base mt-2">

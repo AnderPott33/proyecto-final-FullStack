@@ -10,6 +10,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function Entidades() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const { puedeAcceder, puede } = usePermiso();
 const tienePermiso = puedeAcceder("entidades")
@@ -94,7 +95,7 @@ const tienePermiso = puedeAcceder("entidades")
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/entidades", {
+      const res = await axios.get(`${API}/api/entidades`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -157,7 +158,7 @@ const tienePermiso = puedeAcceder("entidades")
 
       if (entidadActiva) {
         await axios.put(
-          `http://localhost:5000/api/entidades/${entidadActiva.id}`,
+          `${API}/api/entidades/${entidadActiva.id}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -175,7 +176,7 @@ const tienePermiso = puedeAcceder("entidades")
         });
       } else {
         await axios.post(
-          "http://localhost:5000/api/entidades/nueva",
+          `${API}/api/entidades/nueva`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );

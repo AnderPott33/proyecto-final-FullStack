@@ -9,6 +9,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from 'react-router-dom'
 
 export default function MarcaArticulo() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("marcas")
@@ -32,7 +33,7 @@ const tienePermiso = puedeAcceder("marcas")
     const cargarmarcas = async () => {
         try {
             const token = localStorage.getItem('token');
-            const result = await axios.get(`http://localhost:5000/api/marcas/`, {
+            const result = await axios.get(`${API}/api/marcas/`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMarcas(result.data);
@@ -53,7 +54,7 @@ const tienePermiso = puedeAcceder("marcas")
                 try {
                     const token = localStorage.getItem("token");
 
-                    const result = await axios.get(`http://localhost:5000/api/stock/marca/${marcaselect}`,
+                    const result = await axios.get(`${API}/api/stock/marca/${marcaselect}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
                     setArticulo(result.data);
@@ -75,7 +76,7 @@ const tienePermiso = puedeAcceder("marcas")
                 try {
                     const token = localStorage.getItem("token");
 
-                    const result = await axios.get(`http://localhost:5000/api/marcas/${marcaselect}`,
+                    const result = await axios.get(`${API}/api/marcas/${marcaselect}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
 
@@ -102,7 +103,7 @@ const tienePermiso = puedeAcceder("marcas")
                 const token = localStorage.getItem("token");
                 if (marcaselect) {
 
-                    const result = await axios.put(`http://localhost:5000/api/marcas/editarMarca/${marcaselect}`,
+                    const result = await axios.put(`${API}/api/marcas/editarMarca/${marcaselect}`,
                         formData,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
@@ -123,7 +124,7 @@ const tienePermiso = puedeAcceder("marcas")
                         },
                     });
                 } else {
-                    const result = await axios.post(`http://localhost:5000/api/marcas/nuevaMarca`,
+                    const result = await axios.post(`${API}/api/marcas/nuevaMarca`,
                         formData,
                         { headers: { Authorization: `Bearer ${token}` } }
                     )
@@ -168,7 +169,7 @@ const tienePermiso = puedeAcceder("marcas")
             });
 
             if (result.isConfirmed) {
-                await axios.delete(`http://localhost:5000/api/marcas/deletarCategoria/${marcaselect}`, {
+                await axios.delete(`${API}/api/marcas/deletarCategoria/${marcaselect}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

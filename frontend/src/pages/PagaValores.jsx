@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { usePermiso } from "../hooks/usePermiso";
 
 export default function PagaValores() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { puedeAcceder, puede } = usePermiso();
   const tienePermiso = puedeAcceder("paga_valores")
@@ -60,7 +61,7 @@ export default function PagaValores() {
   const encontformaPago = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get('http://localhost:5000/api/formaPago', {
+      const res = await axios.get(`${API}/api/formaPago`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data || [];
@@ -85,7 +86,7 @@ export default function PagaValores() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        'http://localhost:5000/api/cuenta/formaPago',
+        `${API}/api/cuenta/formaPago`,
         { id: formaPagoId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -123,7 +124,7 @@ export default function PagaValores() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/api/cambio",
+        `${API}/api/cambio`,
         {
           monedaOrigen: moneda,
           monedaDestino: monedaCta,
@@ -223,7 +224,7 @@ export default function PagaValores() {
   const buscarEntidad = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/entidad", {
+      const res = await axios.get(`${API}/api/entidad`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEntidad(res.data || []);
@@ -235,87 +236,6 @@ export default function PagaValores() {
   useEffect(() => {
     buscarEntidad();
   }, []);
-
-
-  // REGISTRAR MOVIMIENTO y limpiar encabezado
-  /*   const handleRegistrarMovimiento = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const descripcionInput = document.querySelector('[name="descripcionFinanciero"]');
-        const referenciaInput = document.querySelector('[name="referenciaDocFinanciero"]');
-  
-        const payload = {
-          //Encabezado
-          fecha,
-          descripcion: descripcionInput.value,
-          referencia: referenciaInput.value,
-          usuario_id: usuario.id,
-          moneda_principal: moneda,
-          tipo_cambio: cambio,
-          tipo_operacion: "GASTO",
-          estado: "ACTIVO",
-          caja_logueada: caja.id,
-          //Cuerpo -- Detalles
-          detalle: itemsDetalle.map(i => ({
-            cuenta_id: i.cuenta_id,
-            tipo: i.tipo,
-            monto: i.monto,
-            descripcion: i.descripcion,
-            forma_pago: i.forma_pago,
-            moneda: i.moneda,
-            monedaCta: i.monedaCta,
-            cambio: i.cambio,
-            monto_moneda_cuenta: i.monto_moneda_cuenta,
-            entidad: i.entidad,
-            tp_doc: i.tipo_doc,
-            documento: i.documento
-          }))
-        };
-  
-        const res = await axios.post("http://localhost:5000/api/movimientos", payload, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-  
-        if (res.status === 201) {
-          Swal.fire({
-            title: "Movimiento registrado con éxito",
-            icon: "success",
-            iconColor: "#35b9ac",
-            background: "#1f2937",
-            color: "white",
-            buttonsStyling: false,
-            customClass: {
-              confirmButton:
-                "bg-gradient-to-r from-[#35b9ac] to-[#2da89c] px-4 py-2 rounded-md text-white hover:brightness-105 transition cursor-pointer",
-            },
-          });
-          setItemsDetalle([]);
-          descripcionInput.value = "";
-          referenciaInput.value = "";
-          setCuentaSelect(null);
-          setFormaPagoId(null);
-          setEntidadSelect(null);
-          setTipoDocumento(null);
-          setMoneda('PYG');
-        }
-      } catch (error) {
-        console.error(error);
-        Swal.fire({
-          title: "Error al registrar movimiento",
-          icon: "error",
-          iconColor: "orange",
-          background: "#1f2937",
-          color: "white",
-          buttonsStyling: false,
-          customClass: {
-            confirmButton:
-              "bg-gradient-to-r from-[#35b9ac] to-[#2da89c] px-4 py-2 rounded-md text-white hover:brightness-105 transition cursor-pointer",
-          },
-        });
-      }
-      setLoading(false);
-    }; */
 
   const handleRegistrarMovimiento = async () => {
     const descripcionInput = document.querySelector('[name="descripcionFinanciero"]');
@@ -380,7 +300,7 @@ export default function PagaValores() {
         }))
       };
 
-      const res = await axios.post("http://localhost:5000/api/movimientos", payload, {
+      const res = await axios.post(`${API}/api/movimientos`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

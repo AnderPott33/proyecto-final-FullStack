@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { actualizarAutorizacionesPuntos, crearAutorizacionesPuntos, obtenerAutorizacionesPuntos, eliminarAutorizacionesPuntos } from '../controllers/authPuntoExp.controller.js';
+import { actualizarAutorizacionesPuntos, crearAutorizacionesPuntos, obtenerAutorizacionesPuntos } from '../controllers/authPuntoExp.controller.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -10,7 +10,6 @@ router.use(requireAuth);
 router.get('/', requireAuth, obtenerAutorizacionesPuntos);
 router.post('/agregarAuthPuntos', requireAuth, crearAutorizacionesPuntos);
 router.put('/actualizarAuthPuntos/:id', requireAuth, actualizarAutorizacionesPuntos);
-router.delete('/eliminarAuthPuntos/:id', requireAuth, eliminarAutorizacionesPuntos);
 
 
 export default router;

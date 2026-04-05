@@ -15,7 +15,7 @@ export const PERMISOS = {
   CONTABILIDAD: {
     acciones: ["crear", "editar", "cerrar_caja", "ver_relatorios_financieros", "alterar_fecha_caja",
        "puede_alterar_valor_inicial_caja", "realizar_movimientos_caja", "inactivar_financiero", "realizar_ajuste_stock", "contabilidad",, ...GLOBAL_ACCIONES],
-    paginas: ["usuarios", "caja", "reportes","movimientos_caja","cuentas", "saldos_cuentas", "compra", "analitico", "contabilidad", ...GLOBAL_PAGINAS]
+    paginas: [ "caja", "reportes","movimientos_caja","cuentas", "saldos_cuentas", "compra", "analitico", "contabilidad", ...GLOBAL_PAGINAS]
   },
   SUPERVISOR_CAJA: {
     acciones: ["crear", "editar", "cerrar_caja", "alterar_fecha_caja",

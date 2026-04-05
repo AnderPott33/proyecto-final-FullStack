@@ -19,6 +19,7 @@ const BANDERAS = {
 };
 
 export default function Cotizaciones() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("cotizaciones")
@@ -54,7 +55,7 @@ const [formData, setFormData] = useState({
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/cambio/cambios", {
+      const res = await axios.get(`${API}/api/cambio/cambios`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCotizaciones(
@@ -109,7 +110,7 @@ const [formData, setFormData] = useState({
       }
 
       await axios.post(
-        "http://localhost:5000/api/cambio/actualizar",
+        `${API}/api/cambio/actualizar`,
         { cotizaciones: cotizacionesAGuardar, fecha: formData.fecha },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -128,7 +129,7 @@ const [formData, setFormData] = useState({
     if (!window.confirm("¿Seguro que desea eliminar esta cotización?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/cambio/${id}`, {
+      await axios.delete(`${API}/api/cambio/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       cargarCotizaciones();

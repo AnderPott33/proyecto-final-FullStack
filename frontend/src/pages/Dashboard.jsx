@@ -16,6 +16,7 @@ const BANDERAS = {
 
 
 export default function Dashboard({ columns }) {
+  const API = import.meta.env.VITE_API_URL;
   const {puede} = usePermiso();
   const { usuario, puntoSeleccionado, seleccionarPunto } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
@@ -39,13 +40,13 @@ export default function Dashboard({ columns }) {
         const token = localStorage.getItem("token");
 
         // --- PUNTOS DEL USUARIO ---
-        const puntosRes = await axios.get(`http://localhost:5000/api/auth/puntos/usuario/${usuario.id}`, {
+        const puntosRes = await axios.get(`${API}/api/auth/puntos/usuario/${usuario.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPuntosUsuario(puntosRes.data || []);
 
         // --- CUENTAS ---
-        const cuentasRes = await axios.post("http://localhost:5000/api/cuenta/saldos", {}, {
+        const cuentasRes = await axios.post(`${API}/api/cuenta/saldos`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const cuentas = Array.isArray(cuentasRes.data) ? cuentasRes.data : [];
@@ -60,21 +61,21 @@ export default function Dashboard({ columns }) {
         });
 
         // --- USUARIOS ---
-        const usuariosRes = await axios.get("http://localhost:5000/api/auth", {
+        const usuariosRes = await axios.get(`${API}/api/auth`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const usuarios = Array.isArray(usuariosRes.data) ? usuariosRes.data : [];
         const usuariosActivos = usuarios.filter(u => u.estado === "ACTIVO");
 
         // --- MOVIMIENTOS ---
-        const movimientosRes = await axios.get("http://localhost:5000/api/movimientos", {
+        const movimientosRes = await axios.get(`${API}/api/movimientos`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const movimientos = Array.isArray(movimientosRes.data.movimientos) ? movimientosRes.data.movimientos : [];
         movimientos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
         // --- A COBRAR / A PAGAR ---
-        const aPagarCobrarRes = await axios.post("http://localhost:5000/api/cuenta/saldosCobrarPagar", {}, {
+        const aPagarCobrarRes = await axios.post(`${API}/api/cuenta/saldosCobrarPagar`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const aCobrarPagar = Array.isArray(aPagarCobrarRes.data) ? aPagarCobrarRes.data : [];

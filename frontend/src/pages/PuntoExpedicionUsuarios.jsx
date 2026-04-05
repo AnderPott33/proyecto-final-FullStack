@@ -11,13 +11,14 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function PuntoExpedicionUsuarios() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
-    const {puedeAcceder, puede} = usePermiso();
-const tienePermiso = puedeAcceder("contabilidad")
+    const { puedeAcceder, puede } = usePermiso();
+    const tienePermiso = puedeAcceder("contabilidad")
     useEffect(() => {
-          if (!tienePermiso) {navigate("/error-permiso");}
-  }, [navigate, tienePermiso])
-  if (!tienePermiso) return null;
+        if (!tienePermiso) { navigate("/error-permiso"); }
+    }, [navigate, tienePermiso])
+    if (!tienePermiso) return null;
     const [modalOpen, setModalOpen] = useState(false);
     const [usuariosList, setUsuariosList] = useState([]);
     const [puntosList, setPuntosList] = useState([]);
@@ -27,7 +28,8 @@ const tienePermiso = puedeAcceder("contabilidad")
 
     const [dataForm, setDataForm] = useState({
         usuario_id: "",
-        punto_id: ""
+        punto_id: "",
+        activo: ""
     });
 
 
@@ -38,7 +40,8 @@ const tienePermiso = puedeAcceder("contabilidad")
         setEditActivo(null);
         setDataForm({
             usuario_id: "",
-            punto_id: ""
+            punto_id: "",
+            activo: 1
         });
         setModalOpen(true)
     }
@@ -46,7 +49,8 @@ const tienePermiso = puedeAcceder("contabilidad")
         setEditActivo(e);
         setDataForm({
             usuario_id: e.usuario_id,
-            punto_id: e.punto_id
+            punto_id: e.punto_id,
+            activo: e.activo
         });
         setModalOpen(true)
     }
@@ -54,10 +58,11 @@ const tienePermiso = puedeAcceder("contabilidad")
     const buscarAuthPuntos = async () => {
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/authPuntos/`, {
+            const result = await axios.get(`${API}/api/authPuntos/`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setAuthPuntos(result.data)
+
         } catch (error) {
             console.error(error);
         }
@@ -70,7 +75,7 @@ const tienePermiso = puedeAcceder("contabilidad")
     const fetchData = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get("http://localhost:5000/api/empresa/puntoExpedicion", {
+            const response = await axios.get(`${API}/api/empresa/puntoExpedicion`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -90,7 +95,7 @@ const tienePermiso = puedeAcceder("contabilidad")
     const buscarUsuarios = async () => {
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/auth/`, {
+            const result = await axios.get(`${API}/api/auth/`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setUsuariosList(result.data);
@@ -108,7 +113,7 @@ const tienePermiso = puedeAcceder("contabilidad")
         try {
             const token = localStorage.getItem("token");
             if (editActivo) {
-                await axios.put(`http://localhost:5000/api/authPuntos/actualizarAuthPuntos/${editActivo.id}`,
+                await axios.put(`${API}/api/authPuntos/actualizarAuthPuntos/${editActivo.id}`,
                     dataForm,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
@@ -125,7 +130,7 @@ const tienePermiso = puedeAcceder("contabilidad")
                     },
                 });
             } else {
-                await axios.post(`http://localhost:5000/api/authPuntos/agregarAuthPuntos`,
+                await axios.post(`${API}/api/authPuntos/agregarAuthPuntos`,
                     dataForm,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
@@ -148,7 +153,8 @@ const tienePermiso = puedeAcceder("contabilidad")
         }
         setDataForm({
             usuario_id: "",
-            punto_id: ""
+            punto_id: "",
+            activo: ""
         });
         setModalOpen(false);
         buscarAuthPuntos();
@@ -177,7 +183,7 @@ const tienePermiso = puedeAcceder("contabilidad")
         if (confirm.isConfirmed) {
             try {
                 const token = localStorage.getItem("token");
-                await axios.delete(`http://localhost:5000/api/authPuntos/eliminarAuthPuntos/${registro.id}`, {
+                await axios.delete(`${API}/api/authPuntos/eliminarAuthPuntos/${registro.id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 Swal.fire({
@@ -272,7 +278,20 @@ const tienePermiso = puedeAcceder("contabilidad")
                         { accessor: "id", header: "ID" },
                         { accessor: "usuario_nombre", header: "Usuario" },
                         { accessor: "punto_nombre", header: "Punto" },
-
+                        {
+                            accessor: "activo",
+                            header: "Activo",
+                            cell: (e) => (
+                                <span className={`
+            px-2 py-1 rounded-full text-xs font-semibold
+            ${e.activo
+                                        ? "bg-green-100 text-green-700"
+                                        : "bg-red-100 text-red-700"}
+        `}>
+                                    {e.activo ? "Activo" : "Inactivo"}
+                                </span>
+                            )
+                        },
                         {
                             accessor: "editar", header: "Editar", cell: (e) => (
                                 <button
@@ -303,7 +322,7 @@ const tienePermiso = puedeAcceder("contabilidad")
             {modalOpen && (
                 <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50 p-2 sm:p-4">
 
-                    <div className="bg-white rounded-md w-full max-w-[700px] 
+                    <div className="bg-white rounded-md w-full max-w-[800px] 
                     max-h-[90vh] flex flex-col shadow-xl">
 
                         {/* HEADER */}
@@ -350,6 +369,16 @@ const tienePermiso = puedeAcceder("contabilidad")
                                             )) || []}
                                             value={dataForm.punto_id}
                                             onChange={(e) => setDataForm({ ...dataForm, punto_id: e })}
+                                        />
+                                    </label>
+                                    <label className="flex flex-col w-full md:w-full">
+                                        <span className="text-gray-700">Punto Exp.</span>
+                                        <input
+                                            type="checkbox"
+                                            checked={dataForm.activo || false}
+                                            onChange={(e) =>
+                                                setDataForm({ ...dataForm, activo: e.target.checked })
+                                            }
                                         />
                                     </label>
 

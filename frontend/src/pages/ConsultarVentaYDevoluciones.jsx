@@ -1,7 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { GrMoney } from "react-icons/gr";
-import { FaTrashAlt } from "react-icons/fa";
-import { GiConfirmed } from "react-icons/gi";
+import { AiOutlineFileSearch } from "react-icons/ai";
 import SelectCustom from "../components/SelectCustom";
 import DataTable from "../components/DataTable";
 import { formatearNumero, formatearNumeroSimple, formatearFechaInput, formatearFecha } from "../components/FormatoFV";
@@ -14,6 +12,7 @@ import ModalVentas from "../components/ModalVentas";
 import { useNavigate } from "react-router-dom";
 
 export default function ConsultarVentaYDevoluciones() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("venta")
@@ -58,7 +57,7 @@ const tienePermiso = puedeAcceder("venta")
     const buscarNuevaSeqVenta = async () => {
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/ventas/nuevaSeqVenta/${timbrado}`, {
+            const result = await axios.get(`${API}/api/ventas/nuevaSeqVenta/${timbrado}`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setDatosForm(prev => ({
@@ -81,7 +80,7 @@ const tienePermiso = puedeAcceder("venta")
     const buscarVentas = async () => {
         try {
             const token = localStorage.getItem("token");
-            const { data } = await axios.get("http://localhost:5000/api/ventas", {
+            const { data } = await axios.get(`${API}/api/ventas`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setVentas(data);
@@ -101,7 +100,7 @@ const tienePermiso = puedeAcceder("venta")
             const cargarVenta = async () => {
                 try {
                     const token = localStorage.getItem("token");
-                    const { data } = await axios.get(`http://localhost:5000/api/ventas/${ventaSelect}`, {
+                    const { data } = await axios.get(`${API}/api/ventas/${ventaSelect}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
 
@@ -162,7 +161,7 @@ const tienePermiso = puedeAcceder("venta")
             };
 
             const res = await axios.post(
-                `http://localhost:5000/api/ventas/devolverVenta/${ventaSelect}`,
+                `${API}/api/ventas/devolverVenta/${ventaSelect}`,
                 payload,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -214,7 +213,7 @@ const totalGeneral = itemsLista.reduce(
             const token = localStorage.getItem("token");
 
             const response = await axios.get(
-                `http://localhost:5000/api/ventas/imprimir/${tipo}/${idVenta}`,
+                `${API}/api/ventas/imprimir/${tipo}/${idVenta}`,
                 {
                     headers: { Authorization: `Bearer ${token}` },
                     responseType: "blob", // importante para PDF
@@ -236,7 +235,7 @@ const totalGeneral = itemsLista.reduce(
                         rounded-md p-6 md:p-8 shadow-lg shadow-gray-300/30">
                     <div>
                         <h1 className="text-2xl md:text-3xl flex gap-2 font-bold text-white tracking-wide">
-                            <GrMoney />
+                            <AiOutlineFileSearch />
                             Consultar Venta
                         </h1>
                         <p className="text-white/90 text-sm md:text-base mt-2">

@@ -8,8 +8,10 @@ import { RiFileSearchFill } from "react-icons/ri";
 import { FaMagnifyingGlassArrowRight } from "react-icons/fa6";
 import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function AnaliticoCobrarPagar() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("analitico_cta_cobrar_pagar");
@@ -32,25 +34,29 @@ const tienePermiso = puedeAcceder("analitico_cta_cobrar_pagar");
   const obtenerCuentas = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/cuenta/", {
+      const res = await axios.get(`${API}/api/cuenta/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data || [];
     } catch (error) {
-      console.error("Error al traer cuentas:", error);
+      console.error(error);
+      Swal.fire('Error', `Error en el servidor!`,'error');
       return [];
+    }finally{
+      setLoading(false)
     }
   };
 
   const obtenerEntidades = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/entidad/", {
+      const res = await axios.get(`${API}/api/entidad/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data || [];
     } catch (error) {
       console.error("Error al traer entidades:", error);
+      Swal.fire('Error', `Error en el servidor!`,'error');
       return [];
     }
   };
@@ -78,7 +84,7 @@ const tienePermiso = puedeAcceder("analitico_cta_cobrar_pagar");
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        "http://localhost:5000/api/cuenta/analiticoEntidad",
+        `${API}/api/cuenta/analiticoEntidad`,
         { 
           cuentaId: cuentaSelect, 
           entidadId: entidadSelect, 
@@ -91,6 +97,7 @@ const tienePermiso = puedeAcceder("analitico_cta_cobrar_pagar");
       setDatos(res.data ?? []);
     } catch (error) {
       console.error("Error al traer saldo analítico:", error);
+      Swal.fire('Error', `Error en el servidor!`,'error');
       setDatos([]);
     } finally {
       setLoading(false);

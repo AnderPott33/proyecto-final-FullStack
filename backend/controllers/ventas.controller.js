@@ -464,6 +464,72 @@ GROUP BY codigo_emp, codigo_suc;`,
 }
 
 
+export const inactivarCompraVenta = async (req, res) => {
+    const { id } = req.params;
+    const { forzar } = req.query;
+
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        // 1️⃣ Buscar hijos (devoluciones)
+        const { rows: hijos } = await client.query(
+            `SELECT id, estado
+             FROM compras_ventas
+             WHERE referencia_id = $1`,
+            [id]
+        );
+
+        const hijosActivos = hijos.filter(h => h.estado === "ACTIVO");
+
+        // 2️⃣ Si hay hijos activos y NO viene forzar → bloquear
+        if (hijosActivos.length > 0 && forzar !== "true") {
+            await client.query("ROLLBACK");
+            return res.status(400).json({
+                message: "Esta venta tiene devoluciones activas",
+                tieneReferencias: true
+            });
+        }
+
+        // 3️⃣ Si viene forzar → inactivar hijos primero
+        if (hijosActivos.length > 0 && forzar === "true") {
+            await client.query(
+                `UPDATE compras_ventas
+                 SET estado = 'INACTIVO'
+                 WHERE referencia_id = $1`,
+                [id]
+            );
+        }
+
+        // 4️⃣ Inactivar la venta
+        await client.query(
+            `UPDATE compras_ventas
+             SET estado = 'INACTIVO'
+             WHERE id = $1`,
+            [id]
+        );
+
+        await client.query("COMMIT");
+
+        res.json({ message: "Registro inactivado correctamente" });
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.error(error);
+
+        res.status(500).json({
+            message: "Error al inactivar"
+        });
+    } finally {
+        client.release();
+    }
+};
+
+
+
+
+
 
 
 // ===============================

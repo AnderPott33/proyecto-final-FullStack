@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { GrMoney } from "react-icons/gr";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
-import { MdCleaningServices } from "react-icons/md";
+import { MdKeyboardReturn } from "react-icons/md";
 import SelectCustom from "../components/SelectCustom";
 import DataTable from "../components/DataTable";
 import { formatearNumero, formatearNumeroSimple } from "../components/FormatoFV";
@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
 export default function DevolucionCompra() {
+    const API = import.meta.env.VITE_API_URL;
     const [modalOpen, setModalOpen] = useState(false)
     const [filtroTexto, setFiltroTexto] = useState("");
     const [editandoId, setEditandoId] = useState(null);
@@ -61,7 +62,7 @@ export default function DevolucionCompra() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/compras/`, {
+            const result = await axios.get(`${API}/api/compras/`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setComprasList(result.data.filter(f => f.tipo === 'COMPRA'));
@@ -80,7 +81,7 @@ export default function DevolucionCompra() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/compras/buscarComprasyDevulucion`, {
+            const result = await axios.get(`${API}/api/compras/buscarComprasyDevulucion`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             const mapa = {};
@@ -164,7 +165,7 @@ export default function DevolucionCompra() {
     const buscarCuentas = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/cuenta/`,
+            const result = await axios.get(`${API}/api/cuenta/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaCuentas(result.data);
         } catch (error) {
@@ -179,7 +180,7 @@ export default function DevolucionCompra() {
     const buscarFormasPago = async (e) => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/formaPago/`,
+            const result = await axios.get(`${API}/api/formaPago/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaFormaPago(result.data);
 
@@ -196,7 +197,7 @@ export default function DevolucionCompra() {
     const buscarArticulos = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/articulo`,
+            const result = await axios.get(`${API}/api/articulo`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setArticulos(result.data);
@@ -209,33 +210,6 @@ export default function DevolucionCompra() {
     useEffect(() => {
         buscarArticulos();
     }, [])
-
-    /*   useEffect(() => {
-          setLoading(true)
-          if (articuloSelect) {
-              const buscarArticulosId = async () => {
-                  const token = localStorage.getItem("token");
-                  try {
-                      const result = await axios.get(`http://localhost:5000/api/articulo/${articuloSelect}`,
-                          { headers: { Authorization: `Bearer ${token}` } }
-                      )
-  
-                      setDetalle({
-                          producto_id: result.data[0].id,
-                          producto_nombre: result.data[0].nombre_articulo,
-                          impuesto_por: result.data[0].tipo_impuesto,
-                          impuesto: result.data[0].impuesto,
-                          cantidad: 1
-                      })
-  
-                  } catch (error) {
-                      console.error(error);
-                  }
-              }
-              buscarArticulosId()
-          }
-          setLoading(false)
-      }, [articuloSelect]) */
 
     const agregarDetalle = () => {
         setLoading(true)
@@ -389,7 +363,7 @@ export default function DevolucionCompra() {
     const buscarEntidad = async () => {
         try {
             const token = localStorage.getItem("token");
-            const { data } = await axios.get(`http://localhost:5000/api/entidad`, {
+            const { data } = await axios.get(`${API}/api/entidad`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEntidad(data);
@@ -409,7 +383,7 @@ export default function DevolucionCompra() {
                 const token = localStorage.getItem("token");
                 try {
                     const result = await axios.get(
-                        `http://localhost:5000/api/compras/devolver/${formEncabezado.referencia_id}`,
+                        `${API}/api/compras/devolver/${formEncabezado.referencia_id}`,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
 
@@ -539,7 +513,7 @@ export default function DevolucionCompra() {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.post(
-                    "http://localhost:5000/api/compras/nuevaDevolucionCompra",
+                    `${API}/api/compras/nuevaDevolucionCompra`,
                     payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -580,7 +554,7 @@ export default function DevolucionCompra() {
             const token = localStorage.getItem("token");
 
             const result = await axios.get(
-                `http://localhost:5000/api/articulo/${row.id}`,
+                `${API}/api/articulo/${row.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -627,7 +601,7 @@ export default function DevolucionCompra() {
             const token = localStorage.getItem("token");
 
             const result = await axios.get(
-                `http://localhost:5000/api/articulo/${input}`,
+                `${API}/api/articulo/${input}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -699,7 +673,7 @@ export default function DevolucionCompra() {
                         rounded-md p-6 md:p-8 shadow-lg shadow-gray-300/30">
                     <div>
                         <h1 className="text-2xl md:text-3xl flex gap-2 font-bold text-white tracking-wide">
-                            <GrMoney />
+                            <MdKeyboardReturn />
                             Nueva Nota Crédita Recebida
                         </h1>
                         <p className="text-white/90 text-sm md:text-base mt-2">

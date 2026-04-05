@@ -10,6 +10,7 @@ import { FaSitemap } from "react-icons/fa6";
 import { usePermiso } from "../hooks/usePermiso";
 
 export default function CuentasFinancieras() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { puedeAcceder, puede } = usePermiso();
 const tienePermiso = puedeAcceder("cuentas")
@@ -53,7 +54,7 @@ const tienePermiso = puedeAcceder("cuentas")
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/cuenta", {
+      const res = await axios.get(`${API}/api/cuenta`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -150,8 +151,8 @@ const tienePermiso = puedeAcceder("cuentas")
       };
 
       const url = cuentaActiva
-        ? `http://localhost:5000/api/cuenta/${cuentaActiva.id}`
-        : "http://localhost:5000/api/cuenta";
+        ? `${API}/api/cuenta/${cuentaActiva.id}`
+        : `${API}/api/cuenta`;
 
       const method = cuentaActiva ? axios.put : axios.post;
 

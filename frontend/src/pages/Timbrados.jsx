@@ -12,6 +12,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function PuntoExpedicion() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("contabilidad")
@@ -82,7 +83,7 @@ const tienePermiso = puedeAcceder("contabilidad")
     const buscarTimbrados = async () => {
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/timbrados`, {
+            const result = await axios.get(`${API}/api/timbrados`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setTimbradoList(result.data);
@@ -98,7 +99,7 @@ const tienePermiso = puedeAcceder("contabilidad")
     const buscarEmpresa = async () => {
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/empresa`,
+            const result = await axios.get(`${API}/api/empresa`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setEmpresaList(result.data);
@@ -114,7 +115,7 @@ const tienePermiso = puedeAcceder("contabilidad")
     const fetchData = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await axios.get("http://localhost:5000/api/empresa/puntoExpedicion", {
+            const response = await axios.get(`${API}/api/empresa/puntoExpedicion`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -133,7 +134,7 @@ const tienePermiso = puedeAcceder("contabilidad")
     const buscarCuenta = async () => {
         try {
             const token = localStorage.getItem("token");
-            const result = await axios.get(`http://localhost:5000/api/cuenta`,
+            const result = await axios.get(`${API}/api/cuenta`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setCuentaList(result.data);
@@ -152,7 +153,7 @@ const tienePermiso = puedeAcceder("contabilidad")
         try {
             const token = localStorage.getItem("token");
             if (timbradoActivo) {
-                await axios.put(`http://localhost:5000/api/timbrados/actualizarTimbrado/${timbradoActivo.id}`,
+                await axios.put(`${API}/api/timbrados/actualizarTimbrado/${timbradoActivo.id}`,
                     dataForm,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )
@@ -169,7 +170,7 @@ const tienePermiso = puedeAcceder("contabilidad")
                     },
                 });
             } else {
-                await axios.post(`http://localhost:5000/api/timbrados/agregarTimbrado`,
+                await axios.post(`${API}/api/timbrados/agregarTimbrado`,
                     dataForm,
                     { headers: { Authorization: `Bearer ${token}` } }
                 )

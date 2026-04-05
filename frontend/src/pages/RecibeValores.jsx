@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { usePermiso } from "../hooks/usePermiso";
 
 export default function RecibeValores() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { puedeAcceder, puede } = usePermiso();
   const tienePermiso = puedeAcceder("recibe_valores")
@@ -60,7 +61,7 @@ export default function RecibeValores() {
   const encontformaPago = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get('http://localhost:5000/api/formaPago', {
+      const res = await axios.get(`${API}/api/formaPago`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       return res.data || [];
@@ -85,7 +86,7 @@ export default function RecibeValores() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        'http://localhost:5000/api/cuenta/formaPago',
+        `${API}/api/cuenta/formaPago`,
         { id: formaPagoId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -123,7 +124,7 @@ export default function RecibeValores() {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/api/cambio",
+        `${API}/api/cambio`,
         {
           monedaOrigen: moneda,
           monedaDestino: monedaCta,
@@ -217,7 +218,7 @@ export default function RecibeValores() {
   const buscarEntidad = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/entidad", {
+      const res = await axios.get(`${API}/api/entidad`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEntidad(res.data || []);
@@ -292,7 +293,7 @@ export default function RecibeValores() {
         }))
       };
 
-      const res = await axios.post("http://localhost:5000/api/movimientos", payload, {
+      const res = await axios.post(`${API}/api/movimientos`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

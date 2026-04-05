@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
 export default function RegistrarVenta() {
+    const API = import.meta.env.VITE_API_URL;
     const [modalOpen, setModalOpen] = useState(false)
     const [editandoId, setEditandoId] = useState(null);
     const [filtroTexto, setFiltroTexto] = useState("");
@@ -116,7 +117,7 @@ export default function RegistrarVenta() {
 
             try {
                 const token = localStorage.getItem("token");
-                const result = await axios.get(`http://localhost:5000/api/ventas/nuevaSeqVenta/${timbrado}`, {
+                const result = await axios.get(`${API}/api/ventas/nuevaSeqVenta/${timbrado}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 })
                 setFormEncabezado(prev => ({
@@ -151,7 +152,7 @@ export default function RegistrarVenta() {
     const buscarCuentas = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/cuenta/`,
+            const result = await axios.get(`${API}/api/cuenta/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaCuentas(result.data);
         } catch (error) {
@@ -166,7 +167,7 @@ export default function RegistrarVenta() {
     const buscarFormasPago = async (e) => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/formaPago/`,
+            const result = await axios.get(`${API}/api/formaPago/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaFormaPago(result.data);
 
@@ -183,7 +184,7 @@ export default function RegistrarVenta() {
     const buscarArticulos = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/articulo`,
+            const result = await axios.get(`${API}/api/articulo`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setArticulos(result.data);
@@ -196,34 +197,6 @@ export default function RegistrarVenta() {
     useEffect(() => {
         buscarArticulos();
     }, [])
-
-    /*  useEffect(() => {
-         setLoading(true)
-         if (articuloSelect) {
-             const buscarArticulosId = async () => {
-                 const token = localStorage.getItem("token");
-                 try {
-                     const result = await axios.get(`http://localhost:5000/api/articulo/${articuloSelect}`,
-                         { headers: { Authorization: `Bearer ${token}` } }
-                     )
- 
-                     setDetalle({
-                         producto_id: result.data[0].id,
-                         producto_nombre: result.data[0].nombre_articulo,
-                         precio_unitario: result.data[0].precio_venta,
-                         impuesto_por: result.data[0].tipo_impuesto,
-                         impuesto: result.data[0].impuesto,
-                         cantidad: 1
-                     })
- 
-                 } catch (error) {
-                     console.error(error);
-                 }
-             }
-             buscarArticulosId()
-         }
-         setLoading(false)
-     }, [articuloSelect]) 
 
     const agregarDetalle = () => {
         if (!detalle.producto_id || detalle.cantidad <= 0) {
@@ -394,7 +367,7 @@ export default function RegistrarVenta() {
     const buscarEntidad = async () => {
         try {
             const token = localStorage.getItem("token");
-            const { data } = await axios.get(`http://localhost:5000/api/entidad`, {
+            const { data } = await axios.get(`${API}/api/entidad`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEntidad(data);
@@ -465,7 +438,7 @@ export default function RegistrarVenta() {
                 try {
                     const token = localStorage.getItem("token");
                     const response = await axios.post(
-                        "http://localhost:5000/api/ventas/nuevaVenta",
+                        `${API}/api/ventas/nuevaVenta`,
                         payload,
                         { headers: { Authorization: `Bearer ${token}` } }
                     );
@@ -519,7 +492,7 @@ export default function RegistrarVenta() {
             const token = localStorage.getItem("token");
 
             const result = await axios.get(
-                `http://localhost:5000/api/articulo/${row.id}`,
+                `${API}/api/articulo/${row.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -953,11 +926,11 @@ export default function RegistrarVenta() {
                                                 onChange={(e) => setFormPago({ ...formPago, monto: e.target.value })}
                                                 className="input w-full"
                                                 onKeyDown={(e) => {
-                                                if (e.key === "Enter") {
-                                                    e.preventDefault();
-                                                    agregarPago();
-                                                }
-                                            }}
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault();
+                                                        agregarPago();
+                                                    }
+                                                }}
                                             />
                                         </label>
                                         <div className="w-1/2 flex gap-3">

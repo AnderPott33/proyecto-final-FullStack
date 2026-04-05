@@ -11,6 +11,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from 'react-router-dom'
 
 export default function MovimientosFinancieros() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("movimientos_financieros")
@@ -71,7 +72,7 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
             const token = localStorage.getItem("token");
 
             await axios.put(
-                `http://localhost:5000/api/movimientos/inactivar/${movimiento.id}`,
+                `${API}/api/movimientos/inactivar/${movimiento.id}`,
                 { motivo },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -118,7 +119,7 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
             setCargandoMov(true);
             const token = localStorage.getItem("token");
 
-            const res = await axios.get("http://localhost:5000/api/movimientos/", {
+            const res = await axios.get(`${API}/api/movimientos/`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -150,7 +151,7 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
                 const token = localStorage.getItem("token");
 
                 const res = await axios.get(
-                    `http://localhost:5000/api/movimientos/${movSeleccionado}`,
+                    `${API}/api/movimientos/${movSeleccionado}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
 

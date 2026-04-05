@@ -98,7 +98,7 @@ export default function ModalCompras({ ventaSelect, setVentaSelect }) {
                         {/* HEADER */}
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-bold text-[#359bac]">
-                                Seleccionar Venta
+                                Seleccionar Compra
                             </h2>
 
                             <button

@@ -10,6 +10,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from 'react-router-dom'
 
 export default function Usuarios() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const { puedeAcceder, puede } = usePermiso();
 const tienePermiso = puedeAcceder("usuarios")
@@ -44,7 +45,7 @@ const tienePermiso = puedeAcceder("usuarios")
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/auth", {
+      const res = await axios.get(`${API}/api/auth`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -83,7 +84,7 @@ const tienePermiso = puedeAcceder("usuarios")
 
       if (usuarioActivo) {
         await axios.put(
-          `http://localhost:5000/api/auth/${usuarioActivo.id}`,
+          `${API}/api/auth/${usuarioActivo.id}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -101,7 +102,7 @@ const tienePermiso = puedeAcceder("usuarios")
         });
       } else {
         await axios.post(
-          "http://localhost:5000/api/auth/register",
+          `${API}/api/auth/register`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );

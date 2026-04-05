@@ -10,6 +10,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function CuentasCobrarPagar() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("saldos_cobrar_pagar")
@@ -33,7 +34,7 @@ const tienePermiso = puedeAcceder("saldos_cobrar_pagar")
   const obtenerCuentas = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/cuenta/", {
+      const res = await axios.get(`${API}/api/cuenta/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data || [];
@@ -46,7 +47,7 @@ const tienePermiso = puedeAcceder("saldos_cobrar_pagar")
   const obtenerEntidades = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/entidad/", {
+      const res = await axios.get(`${API}/api/entidad/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data || [];
@@ -77,7 +78,7 @@ const tienePermiso = puedeAcceder("saldos_cobrar_pagar")
       const token = localStorage.getItem("token");
 
       const res = await axios.post(
-        "http://localhost:5000/api/cuenta/saldoEntidad",
+        `${API}/api/cuenta/saldoEntidad`,
         {
           cuentaId: null,
           entidadId: entidadSelect || null,

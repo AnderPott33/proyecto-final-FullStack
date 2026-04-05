@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { usePermiso } from "../hooks/usePermiso";
 
 export default function RegistrarCaja() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const {puedeAcceder, puede} = usePermiso();
 const tienePermiso = puedeAcceder("registrar_caja")
@@ -88,7 +89,7 @@ const tienePermiso = puedeAcceder("registrar_caja")
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "http://localhost:5000/api/caja/abrir",
+        `${API}/api/caja/abrir`,
         { saldo_inicial: Number(saldoInicial), moneda, fecha_apertura: fechaApertura },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -120,7 +121,7 @@ const tienePermiso = puedeAcceder("registrar_caja")
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:5000/api/caja/actualizar/${caja.id}`,
+        `${API}/api/caja/actualizar/${caja.id}`,
         { fecha_apertura: fechaApertura, moneda },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -138,7 +139,7 @@ const tienePermiso = puedeAcceder("registrar_caja")
   const handleCerrarCaja = async (caja) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:5000/api/caja/cerrar/${caja.id}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.put(`${API}/api/caja/cerrar/${caja.id}`, {}, { headers: { Authorization: `Bearer ${token}` } });
 
       Swal.fire({ title: "Caja cerrada correctamente", icon: "success", background: "#1f2937", color: "white" });
 

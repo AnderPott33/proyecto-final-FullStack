@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader";
 
 export default function RegistrarVenta() {
+    const API = import.meta.env.VITE_API_URL;
     const [modalOpen, setModalOpen] = useState(false)
     const [filtroTexto, setFiltroTexto] = useState("");
     const [editandoId, setEditandoId] = useState(null);
@@ -108,7 +109,7 @@ export default function RegistrarVenta() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/cuenta/`,
+            const result = await axios.get(`${API}/api/cuenta/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaCuentas(result.data);
         } catch (error) {
@@ -125,7 +126,7 @@ export default function RegistrarVenta() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/formaPago/`,
+            const result = await axios.get(`${API}/api/formaPago/`,
                 { headers: { Authorization: `Bearer ${token}` } })
             setListaFormaPago(result.data);
 
@@ -144,7 +145,7 @@ export default function RegistrarVenta() {
         setLoading(true)
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/articulo`,
+            const result = await axios.get(`${API}/api/articulo`,
                 { headers: { Authorization: `Bearer ${token}` } }
             )
             setArticulos(result.data);
@@ -158,33 +159,6 @@ export default function RegistrarVenta() {
     useEffect(() => {
         buscarArticulos();
     }, [])
-
-    /*     useEffect(() => {
-            setLoading(true)
-            if (articuloSelect) {
-                const buscarArticulosId = async () => {
-                    const token = localStorage.getItem("token");
-                    try {
-                        const result = await axios.get(`http://localhost:5000/api/articulo/${articuloSelect}`,
-                            { headers: { Authorization: `Bearer ${token}` } }
-                        )
-    
-                        setDetalle({
-                            producto_id: result.data[0].id,
-                            producto_nombre: result.data[0].nombre_articulo,
-                            impuesto_por: result.data[0].tipo_impuesto,
-                            impuesto: result.data[0].impuesto,
-                            cantidad: 1
-                        })
-    
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-                buscarArticulosId()
-            }
-            setLoading(false)
-        }, [articuloSelect]) */
 
     const agregarDetalle = () => {
         setLoading(true)
@@ -340,7 +314,7 @@ export default function RegistrarVenta() {
     const buscarEntidad = async () => {
         try {
             const token = localStorage.getItem("token");
-            const { data } = await axios.get(`http://localhost:5000/api/entidad`, {
+            const { data } = await axios.get(`${API}/api/entidad`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setEntidad(data);
@@ -410,7 +384,7 @@ export default function RegistrarVenta() {
             try {
                 const token = localStorage.getItem("token");
                 const response = await axios.post(
-                    "http://localhost:5000/api/compras/nuevaCompra",
+                    `${API}/api/compras/nuevaCompra`,
                     payload,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -462,7 +436,7 @@ export default function RegistrarVenta() {
             const token = localStorage.getItem("token");
 
             const result = await axios.get(
-                `http://localhost:5000/api/articulo/${row.id}`,
+                `${API}/api/articulo/${row.id}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -509,7 +483,7 @@ export default function RegistrarVenta() {
             const token = localStorage.getItem("token");
 
             const result = await axios.get(
-                `http://localhost:5000/api/articulo/${input}`,
+                `${API}/api/articulo/${input}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 

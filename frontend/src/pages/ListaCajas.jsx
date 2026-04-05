@@ -11,6 +11,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function ListaCajas() {
+  const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate()
   const { puedeAcceder, puede } = usePermiso();
 
@@ -39,7 +40,7 @@ const tienePermiso = puedeAcceder("caja")
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        "http://localhost:5000/api/caja/loguear",
+        `${API}/api/caja/loguear`,
         { cajaId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -68,7 +69,7 @@ const tienePermiso = puedeAcceder("caja")
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `http://localhost:5000/api/caja/reabrir/${cajaId}`,
+        `${API}/api/caja/reabrir/${cajaId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -98,7 +99,7 @@ const tienePermiso = puedeAcceder("caja")
       setLoading(true);
       const token = localStorage.getItem("token");
 
-      const res = await axios.get("http://localhost:5000/api/caja", {
+      const res = await axios.get(`${API}/api/caja`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

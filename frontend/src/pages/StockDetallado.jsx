@@ -9,6 +9,7 @@ import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from "react-router-dom";
 
 export default function Stock() {
+    const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
     const { puedeAcceder, puede } = usePermiso();
 const tienePermiso = puedeAcceder("stock_detallado")
@@ -27,7 +28,7 @@ const tienePermiso = puedeAcceder("stock_detallado")
     const buscarStock = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/stock/detallado`, {
+            const result = await axios.get(`${API}/api/stock/detallado`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setInventario(result.data)
@@ -42,7 +43,7 @@ const tienePermiso = puedeAcceder("stock_detallado")
     const buscarStockUnico = async () => {
         const token = localStorage.getItem("token");
         try {
-            const result = await axios.get(`http://localhost:5000/api/stock/`, {
+            const result = await axios.get(`${API}/api/stock/`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
             setInventarioUnico(result.data)
