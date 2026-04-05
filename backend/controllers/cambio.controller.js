@@ -1,4 +1,4 @@
-import { pool } from './config/db.js';
+import { pool } from '../config/db.js';
 
 // --- OBTENER tipo de cambio específico ---
 export const obtenerCambio = async (req, res) => {
