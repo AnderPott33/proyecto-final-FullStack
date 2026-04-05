@@ -1,0 +1,10 @@
+PORT=5000
+
+
+DB_USER="postgres"
+DB_HOST="127.0.0.1"
+DB_NAME="app"
+DB_PASS="admin2025"
+DB_PORT=5432
+
+JWT_SECRET=RjfVOLhu/LymRNat3nan7WNRrKvvxMv+qFZO8dHi/FY=

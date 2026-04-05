@@ -1,0 +1,7 @@
+@import "tailwindcss";
+/* INPUT */
+.input {
+  @apply bg-neutral-50 border border-gray-200 text-gray-700 px-5 py-3.5 rounded-sm
+                           focus:border-[#35b9ac] focus:ring-2 focus:ring-[#35b9ac]/20 outline-none
+                           shadow-sm transition-all duration-300 font-semibold text-sm placeholder:text-gray-400;
+}
