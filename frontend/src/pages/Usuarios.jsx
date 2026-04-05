@@ -159,6 +159,8 @@ const tienePermiso = puedeAcceder("usuarios")
       : []),
     { value: "ADMIN", label: "Administrador" },
     { value: "CAJERO", label: "Cajero" },
+    { value: "ENCARGADO_COMPRAS", label: "Encargado Compras" },
+    { value: "CONTABILIDAD", label: "Contabilidad" },
     { value: "SUPERVISOR_CAJA", label: "Supervisor Caja" },
     { value: "SUPERVISOR", label: "Supervisor" },
   ];
