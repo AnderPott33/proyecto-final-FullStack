@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool } from './config/db.js';
 
 // Obtener todas las cuentas
 export const obtenerCuentas = async (req, res) => {

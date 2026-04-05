@@ -1,4 +1,5 @@
-import { pool } from "../config/db.js";
+/* import { pool } from "../config/db.js"; */
+import { pool } from './config/db.js';
 
 export const obtenerArticulos = async (req, res) => {
     try {
