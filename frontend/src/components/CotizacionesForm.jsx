@@ -65,7 +65,7 @@ export default function CotizacionesForm() {
       }
 
       await axios.post(
-        "http://localhost:5000/api/cambio/actualizar",
+        "https://owl-soft.onrender.com/api/cambio/actualizar",
         { cotizaciones: cotizacionesAGuardar },
         { headers: { Authorization: `Bearer ${token}` } }
       );

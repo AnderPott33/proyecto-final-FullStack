@@ -16,7 +16,7 @@ export const CotizacionProvider = ({ children }) => {
       if (!token) return;
 
       const res = await axios.get(
-        "http://localhost:5000/api/cambio/existe-hoy",
+        "https://owl-soft.onrender.com/api/cambio/existe-hoy",
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

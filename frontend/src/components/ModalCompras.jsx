@@ -17,7 +17,7 @@ export default function ModalCompras({ ventaSelect, setVentaSelect }) {
         try {
             const token = localStorage.getItem("token");
 
-            const { data } = await axios.get("http://localhost:5000/api/compras", {
+            const { data } = await axios.get("https://owl-soft.onrender.com/api/compras", {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
