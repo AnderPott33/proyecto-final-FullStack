@@ -9,16 +9,17 @@ import SelectCustom from "../components/SelectCustom";
 import { AuthContext } from "../context/AuthContext";
 import { usePermiso } from "../hooks/usePermiso";
 import { useNavigate } from 'react-router-dom'
+import  imprimirMovimiento  from '../impresion/ImpresionMovimientos'
 
 export default function MovimientosFinancieros() {
     const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
-    const {puedeAcceder, puede} = usePermiso();
-const tienePermiso = puedeAcceder("movimientos_financieros")
+    const { puedeAcceder, puede } = usePermiso();
+    const tienePermiso = puedeAcceder("movimientos_financieros")
     useEffect(() => {
-          if (!tienePermiso) {navigate("/error-permiso");}
-  }, [navigate, tienePermiso])
-  if (!tienePermiso) return null;
+        if (!tienePermiso) { navigate("/error-permiso"); }
+    }, [navigate, tienePermiso])
+    if (!tienePermiso) return null;
     const { puntosUsuario, puntoSeleccionado, seleccionarPunto } = useContext(AuthContext);
     const [puntosIds, setPuntosIds] = useState([]);
 
@@ -192,6 +193,7 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
 
         return cumplePuntos && cumpleId && cumpleUsuario && cumpleEstado && cumpleFechaDesde && cumpleFechaHasta;
     });
+console.log(movimiento);
 
     return (
         <>
@@ -270,74 +272,74 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
 
             {/* Tabla */}
             <div className="rounded-md bg-white shadow-sm w-full mb-4 flex flex-col gap-6 overflow-hidden">
-            
-                    <DataTable
-                        data={movimientosFiltrados}
-                        initialPageSize={15}
-                        pageSizeOptions={[10, 15, 25, 50]}
-                        columns={[
-                            { accessor: "movimiento_id", header: "ID", sortable: true },
-                            { accessor: "usuario", header: "Usuario", className: "text-center", sortable: true },
-                            { accessor: "punto_exp", header: "Punto Exp", align: "center", sortable: true },
-                            {
-                                accessor: "fecha",
-                                header: "Fecha",
-                                className: "text-center",
-                                cell: (row) => formatearFecha(row.fecha),
-                                sortable: true,
-                                sortType: "date",
-                            },
-                            { accessor: "movimiento_descripcion", header: "Descripción", sortable: true },
-                            { accessor: "moneda_principal", header: "Moneda", className: "text-center", sortable: true },
-                            {
-                                accessor: "estado",
-                                header: "Estado",
-                                align: "center",
-                                sortable: true,
-                                cell: (row) => (
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-xs font-medium
-                      ${row.estado === "ACTIVO" && "bg-green-100 text-green-700"}
-                      ${row.estado === "INACTIVO" && "bg-red-100 text-red-700"}`}
-                                    >
-                                        {row.estado}
-                                    </span>
-                                ),
-                            },
-                            {
-                                accessor: "total_monto",
-                                header: "Valor",
-                                className: "text-end font-semibold",
-                                align: "end",
-                                cell: (row) => (
-                                    <span
-                                        className={
-                                            row.total_monto > 0 ? "text-blue-500 font-bold" : "text-red-500"
-                                        }
-                                    >
-                                        {formatearNumero(row.total_monto, row.moneda)}
-                                    </span>
-                                ),
-                            },
-                            {
-                                accessor: "acciones",
-                                header: "",
-                                className: "text-center",
-                                cell: (row) => (
-                                    <button
-                                        onClick={() => {
-                                            setMovSeleccionado(row.movimiento_id);
-                                            setModalOpen(true);
-                                        }}
-                                        className="bg-[#3ba0b4] hover:bg-[#359bac] cursor-pointer text-white px-2 py-1 rounded text-sm"
-                                    >
-                                        Ver
-                                    </button>
-                                ),
-                            },
-                        ]}
-                    />
-              
+
+                <DataTable
+                    data={movimientosFiltrados}
+                    initialPageSize={15}
+                    pageSizeOptions={[10, 15, 25, 50]}
+                    columns={[
+                        { accessor: "movimiento_id", header: "ID", sortable: true },
+                        { accessor: "usuario", header: "Usuario", className: "text-center", sortable: true },
+                        { accessor: "punto_exp", header: "Punto Exp", align: "center", sortable: true },
+                        {
+                            accessor: "fecha",
+                            header: "Fecha",
+                            className: "text-center",
+                            cell: (row) => formatearFecha(row.fecha),
+                            sortable: true,
+                            sortType: "date",
+                        },
+                        { accessor: "movimiento_descripcion", header: "Descripción", sortable: true },
+                        { accessor: "moneda_principal", header: "Moneda", className: "text-center", sortable: true },
+                        {
+                            accessor: "estado",
+                            header: "Estado",
+                            align: "center",
+                            sortable: true,
+                            cell: (row) => (
+                                <span
+                                    className={`px-3 py-1 rounded-full text-xs font-medium
+                                        ${row.estado === "ACTIVO" && "bg-green-100 text-green-700"}
+                                        ${row.estado === "INACTIVO" && "bg-red-100 text-red-700"}`}
+                                >
+                                    {row.estado}
+                                </span>
+                            ),
+                        },
+                        {
+                            accessor: "total_monto",
+                            header: "Valor",
+                            className: "text-end font-semibold",
+                            align: "end",
+                            cell: (row) => (
+                                <span
+                                    className={
+                                        row.total_monto > 0 ? "text-blue-500 font-bold" : "text-red-500"
+                                    }
+                                >
+                                    {formatearNumero(row.total_monto, row.moneda_principal)}
+                                </span>
+                            ),
+                        },
+                        {
+                            accessor: "acciones",
+                            header: "",
+                            className: "text-center",
+                            cell: (row) => (
+                                <button
+                                    onClick={() => {
+                                        setMovSeleccionado(row.movimiento_id);
+                                        setModalOpen(true);
+                                    }}
+                                    className="bg-[#3ba0b4] hover:bg-[#359bac] cursor-pointer text-white px-2 py-1 rounded text-sm"
+                                >
+                                    Ver
+                                </button>
+                            ),
+                        },
+                    ]}
+                />
+
             </div>
 
             {/* Modal */}
@@ -372,6 +374,14 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
                                             <div className="flex flex-col">
                                                 <span className="text-gray-500 px-2 text-xs uppercase">ID</span>
                                                 <span className="text-gray-800 px-2 bg-blue-500 rounded-md text-white font-semibold">{movimiento.id}</span>
+                                            </div>
+                                            <div className="flex justify-end mt-4 gap-2">
+                                                <button
+                                                    onClick={() => imprimirMovimiento(movimiento)}
+                                                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md"
+                                                >
+                                                    Imprimir Movimiento
+                                                </button>
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="text-gray-500 text-xs uppercase">Fecha</span>
@@ -457,7 +467,7 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
                                                     <td className="px-4 py-2">{d.documento || "-"}</td>
                                                     <td className="px-4 py-2">{d.entidad || "-"}</td>
                                                     <td className="px-4 py-2">{d.descripcion || "-"}</td>
-                                                    <td className="px-4 py-2 text-center">{d.moneda}</td>
+                                                    <td className="px-4 py-2 text-center">{movimiento.moneda_principal}</td>
                                                     <td className="px-4 py-2 text-right">
                                                         {d.cambio != null && d.cambio !== ""
                                                             ? Number(d.cambio).toFixed(6)
@@ -465,10 +475,10 @@ const tienePermiso = puedeAcceder("movimientos_financieros")
                                                     </td>
                                                     {/* Débito / Crédito */}
                                                     <td className="px-4 py-2 text-right font-semibold text-green-600">
-                                                        {d.tipo === "DÉBITO" ? formatearNumero(d.monto, d.moneda_principal) : "-"}
+                                                        {d.tipo === "DÉBITO" ? formatearNumero(d.monto, movimiento.moneda_principal) : "-"}
                                                     </td>
                                                     <td className="px-4 py-2 text-right font-semibold text-red-600">
-                                                        {d.tipo === "CRÉDITO" ? formatearNumero(d.monto, d.moneda_principal) : "-"}
+                                                        {d.tipo === "CRÉDITO" ? formatearNumero(d.monto, movimiento.moneda_principal) : "-"}
                                                     </td>
                                                     <td className="px-4 py-2 text-right">{formatearNumero(d.monto_moneda_cuenta, d.moneda)}</td>
                                                 </tr>

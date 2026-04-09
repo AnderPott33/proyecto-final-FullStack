@@ -136,7 +136,6 @@ const tienePermiso = puedeAcceder("movimientos_caja")
 
     // 🔹 Cerrar caja con modal
   const cerrarCaja = async () => {
-    setCargandoMov(true);
     if (!caja) return;
 
     const saldoActual = calcularSaldoActual();
@@ -240,7 +239,6 @@ const tienePermiso = puedeAcceder("movimientos_caja")
     });
 
     if (!resultado) {
-        setCargandoMov(false);
         return;
     }
 

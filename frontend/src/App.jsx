@@ -37,6 +37,7 @@ import DevolucionVenta from './pages/DevolucionVenta';
 import SeleccionarPuntoExp from './pages/SeleccionarPunto';
 import Error from './pages/Error';
 import PerfilUsuario from './pages/Perfil';
+import ImprimirMovimiento from './impresion/ImpresionMovimientos';
 
 function App() {
   return (
@@ -93,6 +94,7 @@ function App() {
             <Route path="/ajustes/contable/puntoExpedicion" element={<PuntoExpedicion />} />
             <Route path="/ajustes/contable/puntoExpedicion/usuarios" element={<PuntoExpedicionUsuarios />} />
             <Route path="/ajustes/contable/timbrados" element={<Timbrados />} />
+            <Route path="/imprimirMovimiento" element={<ImprimirMovimiento />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
         </Routes>

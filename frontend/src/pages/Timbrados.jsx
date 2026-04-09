@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import DataTable from "../components/DataTable";
 import { formatearFecha, formatearFechaInput, formatearNumero } from "../components/FormatoFV";
-import { RiBankLine } from "react-icons/ri";
 import { MdReceiptLong } from "react-icons/md";
 import { FaEdit, FaPlusSquare, FaMapMarkerAlt } from "react-icons/fa";
 import SelectCustom from "../components/SelectCustom";
