@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   const avisoTimeout = useRef(null);
   const logoutTimeout = useRef(null);
 
-  const API = `https://owl-soft.onrender.com/api`;
+const API = import.meta.env.VITE_API_URL;
 
   // =========================
   // 🔐 Inicialización al montar
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         // Obtener datos del usuario
-        const res = await axios.get(`${API}/auth/me`, {
+        const res = await axios.get(`${API}/api/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUsuario(res.data);
@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Traer puntos habilitados para este usuario
-        const puntosRes = await axios.get(`${API}/auth/puntos/usuario/${res.data.id}`, {
+        const puntosRes = await axios.get(`${API}/api/auth/puntos/usuario/${res.data.id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setPuntosUsuario(puntosRes.data);
@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }) => {
     // limpiar cualquier sesión anterior
     limpiarSesion();
 
-    const res = await axios.post(`${API}/auth/login`, { email, password });
+    const res = await axios.post(`${API}/api/auth/login`, { email, password });
     const { token, expireAt, usuario } = res.data;
 
     localStorage.setItem('token', token);
@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }) => {
     setUsuario(usuario);
 
     // Traer puntos del usuario actual
-    const puntosRes = await axios.get(`${API}/auth/puntos/usuario/${usuario.id}`, {
+    const puntosRes = await axios.get(`${API}/api/auth/puntos/usuario/${usuario.id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setPuntosUsuario(puntosRes.data);

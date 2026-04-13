@@ -58,11 +58,14 @@ export const buscarVentaId = async (req, res) => {
   try {
     // 2️⃣ Encabezado de la venta
     const encabezadoQuery = `
-            SELECT v.id, v.fecha, v.numero_factura, v.timbrado, v.condicion_pago,
+            SELECT v.id, v.fecha, v.numero_factura, v.timbrado, t.fecha_inicio, t.fecha_fin, v.condicion_pago,
                    v.moneda, v.observacion, e.id AS cliente_id, e.nombre AS cliente_nombre, e.ruc AS cliente_ruc,
+                   e.direccion, e.ruc, e.telefono, e.email, vv.numero_factura as factura_vinculada,
                    v.usuario_id, v.estado, v.tipo, v.referencia_id
             FROM compras_ventas v
+            LEFT JOIN timbrado t ON t.numero_timbrado = v.timbrado
             LEFT JOIN entidades e ON v.entidad_id = e.id
+            LEFT JOIN compras_ventas vv ON vv.id = v.referencia_id
             WHERE v.id = $1
         `;
     const encabezadoResult = await pool.query(encabezadoQuery, [idStr]);
@@ -467,6 +470,18 @@ GROUP BY codigo_emp, codigo_suc;`,
 export const inactivarCompraVenta = async (req, res) => {
     const { id } = req.params;
     const { forzar } = req.query;
+ const usuario_id = req.user.id;
+  // 🔹 Obtener usuario
+  const usuario = await pool.query(
+    "SELECT nombre FROM usuarios WHERE id = $1",
+    [usuario_id]
+  );
+  const fecha = new Date();
+
+  const pad = (n) => n.toString().padStart(2, "0");
+
+  const fechaFormateada = `${pad(fecha.getDate())}/${pad(fecha.getMonth() + 1)}/${fecha.getFullYear()} ${pad(fecha.getHours())}:${pad(fecha.getMinutes())}:${pad(fecha.getSeconds())}`;
+
 
     const client = await pool.connect();
 
@@ -510,6 +525,43 @@ export const inactivarCompraVenta = async (req, res) => {
             [id]
         );
 
+
+    // 3️⃣ BUSCAR MOVIMIENTO FINANCIERO
+    const mov = await client.query(
+      `SELECT id 
+             FROM movimientos_financieros 
+             WHERE referencia = $1`,
+      [`V${id}`]
+    );
+
+
+
+    if (mov.rowCount > 0) {
+      const movimientoId = mov.rows[0].id;
+      const motivo = 'INACTIVADO POR MODULO VENTA!!'
+      const obs = `Inactivado por: ${usuario.rows[0].nombre} | ${fechaFormateada} | ${motivo}`;
+
+      // 4️⃣ INACTIVAR FINANCIERO
+      await client.query(
+        `UPDATE movimientos_financieros
+                 SET estado = 'INACTIVO', motivo_inac = $2
+                 WHERE id = $1`,
+        [movimientoId, obs]
+      );
+
+
+      // 6️⃣ INACTIVAR CAJA
+      await client.query(
+        `UPDATE movimientos_caja
+                 SET estado = 'INACTIVO'
+                 WHERE ref_financiero = $1`,
+        [movimientoId]
+      );
+    }
+
+
+
+
         await client.query("COMMIT");
 
         res.json({ message: "Registro inactivado correctamente" });
@@ -527,276 +579,90 @@ export const inactivarCompraVenta = async (req, res) => {
 };
 
 
+export const inactivarCompraVenta2 = async (req, res) => {
+  const { id } = req.params;
+  const { forzar } = req.query;
+  const usuario_id = req.user.id;
+  // 🔹 Obtener usuario
+  const usuario = await pool.query(
+    "SELECT nombre FROM usuarios WHERE id = $1",
+    [usuario_id]
+  );
+  const fecha = new Date();
 
+  const pad = (n) => n.toString().padStart(2, "0");
 
+  const fechaFormateada = `${pad(fecha.getDate())}/${pad(fecha.getMonth() + 1)}/${fecha.getFullYear()} ${pad(fecha.getHours())}:${pad(fecha.getMinutes())}:${pad(fecha.getSeconds())}`;
 
-
-
-// ===============================
-// 🔹 FORMATEADORES
-// ===============================
-const formatearNumero = (valor) => {
-  return new Intl.NumberFormat('es-PY', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  }).format(Number(valor) || 0);
-};
-
-const formatearMoneda = (valor) => {
-  return new Intl.NumberFormat('es-PY', {
-    style: 'currency',
-    currency: 'PYG',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(Number(valor) || 0);
-};
-
-const formatearNumeroFactura = (venta) => {
-  const suc = (venta.codigo_suc || '1').padStart(3, '0');
-  const exp = (venta.codigo_emp || '1').padStart(3, '0');
-  const num = String(venta.numero_factura).padStart(7, '0');
-  return `${num}`;
-};
-
-// ===============================
-// 🔹 CONTROLADOR
-// ===============================
-export const imprimirVenta = async (req, res) => {
-  const { id, tipo } = req.params;
+  const client = await pool.connect();
 
   try {
+    await client.query("BEGIN");
 
-    const result = await pool.query(`
-      SELECT 
-        cv.*,
-        e.nombre AS cliente_nombre,
+    // 1️⃣ INACTIVAR VENTA
+    await client.query(
+      `UPDATE compras_ventas
+             SET estado = 'INACTIVO'
+             WHERE id = $1`,
+      [id]
+    );
 
-        t.numero_timbrado,
-        t.fecha_inicio,
-        t.fecha_fin,
-        t.codigo_suc,
-        t.codigo_emp,
-        t.numero_inicio,
-        t.numero_fin,
+    // 2️⃣ INACTIVAR DEVOLUCIONES
+    const { rows: hijos } = await client.query(
+      `UPDATE compras_ventas
+             SET estado = 'INACTIVO'
+             WHERE referencia_id = $1
+             RETURNING id`,
+      [id]
+    );
 
-        COALESCE(
-          json_agg(
-            jsonb_build_object(
-              'producto_nombre', a.nombre_articulo,
-              'cantidad', dv.cantidad,
-              'precio_unitario', dv.precio_unitario,
-              'impuesto_por', dv.impuesto_por,
-              'impuesto', dv.impuesto,
-              'total', dv.total
-            )
-          ) FILTER (WHERE dv.id IS NOT NULL),
-          '[]'
-        ) AS productos,
+    // 3️⃣ BUSCAR MOVIMIENTO FINANCIERO
+    const mov = await client.query(
+      `SELECT id 
+             FROM movimientos_financieros 
+             WHERE referencia = $1`,
+      [`V${id}`]
+    );
 
-        COALESCE(
-          json_agg(
-            jsonb_build_object(
-              'fecha_pago', dp.fecha_pago,
-              'forma_pago', dp.forma_pago,
-              'moneda', dp.moneda,
-              'monto', dp.monto,
-              'banco', dp.banco,
-              'numero_cheque', dp.numero_cheque
-            )
-          ) FILTER (WHERE dp.id IS NOT NULL),
-          '[]'
-        ) AS pagos
+    if (mov.rowCount > 0) {
+      const movimientoId = mov.rows[0].id;
+      const motivo = 'INACTIVADO POR MODULO VENTA!!'
+      const obs = `Inactivado por: ${usuario.rows[0].nombre} | ${fechaFormateada} | ${motivo}`;
 
-      FROM compras_ventas cv
-      LEFT JOIN entidades e ON e.id = cv.entidad_id
-      LEFT JOIN timbrado t ON t.numero_timbrado = cv.timbrado
-      LEFT JOIN detalle_compras_ventas dv ON dv.compra_venta_id = cv.id
-      LEFT JOIN articulo a ON a.id = dv.producto_id
-      LEFT JOIN detalle_pago dp ON dp.compras_ventas_id = cv.id
+      // 4️⃣ INACTIVAR FINANCIERO
+      await client.query(
+        `UPDATE movimientos_financieros
+                 SET estado = 'INACTIVO', motivo_inac = $2
+                 WHERE id = $1`,
+        [movimientoId, obs]
+      );
 
-      WHERE cv.id = $1
-      GROUP BY 
-        cv.id, e.nombre,
-        t.numero_timbrado, t.fecha_inicio, t.fecha_fin,
-        t.codigo_suc, t.codigo_emp,
-        t.numero_inicio, t.numero_fin
-    `, [id]);
 
-    if (!result.rows.length) {
-      return res.status(404).json({ ok: false, mensaje: "Venta no encontrada" });
+      // 6️⃣ INACTIVAR CAJA
+      await client.query(
+        `UPDATE movimientos_caja
+                 SET estado = 'INACTIVO'
+                 WHERE ref_financiero = $1`,
+        [movimientoId]
+      );
     }
 
-    const buscarDatosEmp = await pool.query(`SELECT * FROM empresa`);
-    const datosEmpresa = await buscarDatosEmp.rows[0];
+    await client.query("COMMIT");
 
-    const venta = result.rows[0];
-    const productos = venta.productos || [];
-    const pagos = venta.pagos || [];
-
-    if (venta.numero_factura > venta.numero_fin) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Número de factura fuera de rango del timbrado"
-      });
-    }
-
-    const totalIVA5 = productos.reduce((acc, i) => acc + (i.impuesto_por === "5%" ? Number(i.impuesto) : 0), 0);
-    const totalIVA10 = productos.reduce((acc, i) => acc + (i.impuesto_por === "10%" ? Number(i.impuesto) : 0), 0);
-    const totalGeneral = productos.reduce((acc, i) => acc + Number(i.total), 0);
-
-    const numeroFacturaFormateado = formatearNumeroFactura(venta);
-
-    const doc = new PDFDocument({ size: "A4", margin: 40 });
-
-    let buffers = [];
-    doc.on("data", buffers.push.bind(buffers));
-    doc.on("end", () => {
-      const pdfData = Buffer.concat(buffers);
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `inline; filename=${tipo}_${numeroFacturaFormateado}.pdf`);
-      res.send(pdfData);
+    return res.json({
+      message: "Venta y movimientos relacionados inactivados correctamente"
     });
-
-    const COLOR_PRIMARY = "#359bac";
-    const COLOR_LIGHT = "#f1f5f9";
-
-    // HEADER
-    if (fs.existsSync("./public/logo.png")) {
-      doc.image("./public/logo.png", 40, 30, { width: 90 });
-    }
-
-    doc.font("Helvetica-Bold").fontSize(12)
-      .text(datosEmpresa.nombre_fantasia, 150, 30)
-      .font("Helvetica").fontSize(9)
-      .text(`RUC: ${datosEmpresa.ruc}`)
-      .text(`Dirección: ${datosEmpresa.direccion}`)
-      .text(`Tel: ${datosEmpresa.telefono}`);
-
-    doc.font("Helvetica-Bold").fontSize(16).fillColor(COLOR_PRIMARY)
-      .text(tipo === "factura" ? "FACTURA" : "NOTA DE CRÉDITO", 0, 30, { align: "right" });
-
-    // TIMBRADO
-    doc.rect(380, 60, 180, 80).stroke();
-
-    doc.fontSize(9).fillColor("black")
-      .text(`Timbrado N°: ${venta.numero_timbrado}`, 390, 70)
-      .text(`Vigencia: ${new Date(venta.fecha_inicio).toLocaleDateString()} al ${new Date(venta.fecha_fin).toLocaleDateString()}`, 390, 85)
-      .text(`Factura N°: ${numeroFacturaFormateado}`, 390, 105)
-      .text(`Fecha: ${new Date(venta.fecha).toLocaleString()}`, 390, 120);
-
-    // CLIENTE
-    doc.rect(40, 130, 520, 60).fillAndStroke(COLOR_LIGHT, "#ccc");
-
-    doc.font("Helvetica-Bold").fillColor("black").text("Datos del Cliente", 50, 135);
-
-    doc.font("Helvetica").fontSize(10)
-      .text(`Cliente: ${venta.cliente_nombre}`, 50, 150)
-      .text(`Condición: ${venta.condicion_pago}`, 50, 165)
-      .text(`Estado: ${venta.estado}`, 300, 150);
-
-    // TABLA
-    const startY = 210;
-
-    const cols = {
-      producto: { x: 45, width: 240 },
-      cantidad: { x: 300, width: 50 },
-      precio: { x: 360, width: 60 },
-      iva: { x: 420, width: 50 },
-      total: { x: 480, width: 60 },
-    };
-
-    doc.rect(40, startY, 520, 20).fill(COLOR_PRIMARY);
-
-    doc.fillColor("white").font("Helvetica-Bold").fontSize(10);
-
-    doc.text("Descripción", cols.producto.x, startY + 5, { width: cols.producto.width });
-    doc.text("Cant.", cols.cantidad.x, startY + 5, { width: cols.cantidad.width, align: "right" });
-    doc.text("Precio", cols.precio.x, startY + 5, { width: cols.precio.width, align: "right" });
-    doc.text("IVA", cols.iva.x, startY + 5, { width: cols.iva.width, align: "right" });
-    doc.text("Total", cols.total.x, startY + 5, { width: cols.total.width, align: "right" });
-
-    let y = startY + 20;
-
-    doc.font("Helvetica").fillColor("black");
-
-    productos.forEach((p, i) => {
-      if (i % 2 === 0) {
-        doc.rect(40, y, 520, 18).fill(COLOR_LIGHT);
-      }
-
-      doc.fillColor("black").fontSize(10);
-
-      doc.text(p.producto_nombre, cols.producto.x, y + 4, { width: cols.producto.width });
-
-      doc.text(formatearNumero(p.cantidad), cols.cantidad.x, y + 4, {
-        width: cols.cantidad.width,
-        align: "right",
-      });
-
-      doc.text(formatearNumero(p.precio_unitario), cols.precio.x, y + 4, {
-        width: cols.precio.width,
-        align: "right",
-      });
-
-      doc.text(p.impuesto_por, cols.iva.x, y + 4, {
-        width: cols.iva.width,
-        align: "right",
-      });
-
-      doc.text(formatearNumero(p.total), cols.total.x, y + 4, {
-        width: cols.total.width,
-        align: "right",
-      });
-
-      y += 18;
-    });
-
-    // TOTALES
-    const boxY = y + 10;
-
-    doc.rect(340, boxY, 220, 80).stroke();
-
-    doc.font("Helvetica-Bold").text("Resumen", 350, boxY + 5);
-
-    doc.font("Helvetica");
-
-    doc.text("IVA 5%:", 350, boxY + 25);
-    doc.text(formatearNumero(totalIVA5), 480, boxY + 25, { width: 80, align: "right" });
-
-    doc.text("IVA 10%:", 350, boxY + 40);
-    doc.text(formatearNumero(totalIVA10), 480, boxY + 40, { width: 80, align: "right" });
-
-    doc.font("Helvetica-Bold");
-
-    doc.text("TOTAL:", 350, boxY + 60);
-    doc.text(formatearMoneda(totalGeneral), 480, boxY + 60, { width: 80, align: "right" });
-
-    // PAGOS
-    if (pagos.length) {
-      doc.moveDown(3);
-      doc.font("Helvetica-Bold").text("Detalle de Pagos");
-
-      doc.font("Helvetica");
-
-      pagos.forEach(p => {
-        doc.text(
-          `${new Date(p.fecha_pago).toLocaleDateString()} - ${p.forma_pago} - ${p.moneda} ${formatearNumero(p.monto)}`
-        );
-      });
-    }
-
-    // FOOTER
-    doc.fontSize(8).fillColor("#64748b")
-      .text("Documento generado electrónicamente conforme a la DNIT Paraguay", 40, 750, { align: "center" });
-
-    doc.end();
 
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error);
-    res.status(500).json({
-      ok: false,
-      mensaje: "Error al generar PDF",
+
+    return res.status(500).json({
+      message: "Error al inactivar",
       error: error.message
     });
+
+  } finally {
+    client.release();
   }
 };

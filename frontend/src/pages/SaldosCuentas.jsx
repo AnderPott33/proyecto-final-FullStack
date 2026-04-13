@@ -130,6 +130,7 @@ const tienePermiso = puedeAcceder("saldos_cuentas")
             initialSort={{ column: "cuenta_id", direction: "ascending" }}
             columns={[
               { header: "ID", accessor: "cuenta_id", sortable: true },
+              { header: "Código", accessor: "codigo", sortable: true },
               { header: "Cuenta", accessor: "cuenta", sortable: true },
               { header: "Moneda", accessor: "moneda", sortable: true },
               { header: "Naturaleza", accessor: "naturaleza", sortable: true },

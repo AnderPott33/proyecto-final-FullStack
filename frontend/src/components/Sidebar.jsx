@@ -4,7 +4,7 @@ import {
   FaTachometerAlt, FaCashRegister, FaListUl, FaPlus,
   FaMoneyBillWave, FaArrowDown, FaArrowUp, FaFileAlt,
   FaCogs, FaUserFriends, FaSitemap, FaUsers, FaDollarSign, FaFolderOpen,
-  FaCertificate, FaShoppingCart ,FaCartPlus,FaMapMarkerAlt ,FaBoxOpen 
+  FaCertificate, FaShoppingCart ,FaCartPlus,FaMapMarkerAlt ,FaBoxOpen, FaBalanceScale
 } from "react-icons/fa";
 import { GrMoney } from "react-icons/gr";
 import { MdReceiptLong  } from "react-icons/md";
@@ -51,6 +51,12 @@ export default function Sidebar() {
           items: [
             { name: "Analítico Cuenta", icon: <RiFileSearchFill />, path: "/cuenta/informe/analitico" },
             { name: "Saldos Cuentas", icon: <FaDollarSign />, path: "/cuenta/informe/saldos" }
+          ]
+        },
+        {
+          title: "Informes Contables",
+          items: [
+            { name: "Balance", icon: <FaBalanceScale />, path: "/cuenta/informe/balance" }
           ]
         }
       ]

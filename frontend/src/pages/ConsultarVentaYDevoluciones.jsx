@@ -1,3 +1,4 @@
+import imprimirFactura from '../impresion/ImpresionFactura'
 import { useState, useEffect, useContext } from "react";
 import { AiOutlineFileSearch } from "react-icons/ai";
 import SelectCustom from "../components/SelectCustom";
@@ -14,13 +15,14 @@ import { useNavigate } from "react-router-dom";
 export default function ConsultarVentaYDevoluciones() {
     const API = import.meta.env.VITE_API_URL;
     const navigate = useNavigate()
-    const {puedeAcceder, puede} = usePermiso();
-const tienePermiso = puedeAcceder("venta")
+    const { puedeAcceder, puede } = usePermiso();
+    const tienePermiso = puedeAcceder("venta")
     useEffect(() => {
-            if (!tienePermiso) {navigate("/error-permiso");}
-  }, [navigate, tienePermiso])
-  if (!tienePermiso) return null;
+        if (!tienePermiso) { navigate("/error-permiso"); }
+    }, [navigate, tienePermiso])
+    if (!tienePermiso) return null;
     const { usuario, puntoSeleccionado } = useContext(AuthContext);
+    const [datosVentaImprimir, setDatosVentaImprimir] = useState([])
     const timbradosSelect = puntoSeleccionado?.timbrados?.find(
         t => t.tipo_documento === "NOTA CRÉDITO"
     );
@@ -103,6 +105,7 @@ const tienePermiso = puedeAcceder("venta")
                     const { data } = await axios.get(`${API}/api/ventas/${ventaSelect}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     });
+                    setDatosVentaImprimir(data);
 
                     setFormEncabezado({
                         tipo: data.encabezado.tipo || '',
@@ -133,100 +136,156 @@ const tienePermiso = puedeAcceder("venta")
         }
     }, [ventaSelect]);
 
-    const handleDevolucion = async () => {
-        if (!ventaSelect || !timbrado) {
-            Swal.fire("Error", "Primero selecciona una venta", "error");
-            return;
-        }
+    /*    const handleDevolucion = async () => {
+           if (!ventaSelect || !timbrado) {
+               Swal.fire("Error", "Primero selecciona una venta", "error");
+               return;
+           }
+   
+           const { isConfirmed } = await Swal.fire({
+               title: `¿Seguro que querés generar la devolución y nota de crédito Nº: ${datosForm.nota_credito_N}?`,
+               icon: 'warning',
+               showCancelButton: true,
+               confirmButtonText: 'Sí, devolver',
+               cancelButtonText: 'Cancelar',
+               reverseButtons: true,
+               focusCancel: true
+           });
+   
+           if (!isConfirmed) return;
+   
+           try {
+               const token = localStorage.getItem("token");
+   
+               // Solo enviamos los datos mínimos necesarios
+               const payload = {
+                   timbrado: datosForm.timbrado,
+                   nota_credito_N: datosForm.nota_credito_N
+               };
+   
+               const res = await axios.post(
+                   `${API}/api/ventas/devolverVenta/${ventaSelect}`,
+                   payload,
+                   { headers: { Authorization: `Bearer ${token}` } }
+               );
+   
+               if (res.data.ok) {
+                   Swal.fire({
+                       title: 'Devolución generada correctamente',
+                       icon: 'success',
+                       timer: 2000,
+                       showConfirmButton: false
+                   });
+                   // Recarga las ventas y limpia selección si quieres
+                   buscarVentas();
+               } else {
+                   Swal.fire('Error', res.data.mensaje, 'error');
+               }
+   
+           } catch (err) {
+               console.error(err);
+               Swal.fire('Error', 'Error al procesar la devolución', 'error');
+           }
+       }; */
 
-        const { isConfirmed } = await Swal.fire({
-            title: `¿Seguro que querés generar la devolución y nota de crédito Nº: ${datosForm.nota_credito_N}?`,
-            icon: 'warning',
+    const totalIVA5 = itemsLista.reduce(
+        (acc, item) => acc + (item.impuesto_por === "5%" ? Number(item.impuesto || 0) : 0),
+        0
+    );
+
+    const totalIVA10 = itemsLista.reduce(
+        (acc, item) => acc + (item.impuesto_por === "10%" ? Number(item.impuesto || 0) : 0),
+        0
+    );
+
+    const totalGeneral = itemsLista.reduce(
+        (acc, item) => acc + Number(item.total || 0),
+        0
+    );
+
+    const handleInactivar = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+        // 1️⃣ Confirmación inicial
+        const confirm = await Swal.fire({
+            title: "¿Inactivar registro?",
+            text: "Se cambiará el estado a INACTIVO",
+            icon: "warning",
             showCancelButton: true,
-            confirmButtonText: 'Sí, devolver',
-            cancelButtonText: 'Cancelar',
-            reverseButtons: true,
-            focusCancel: true
+            confirmButtonText: "Sí, inactivar",
+            cancelButtonText: "Cancelar"
         });
 
-        if (!isConfirmed) return;
+        if (!confirm.isConfirmed) return;
 
+        // 2️⃣ Primer intento (sin forzar)
+        let result;
         try {
-            const token = localStorage.getItem("token");
-
-            // Solo enviamos los datos mínimos necesarios
-            const payload = {
-                timbrado: datosForm.timbrado,
-                nota_credito_N: datosForm.nota_credito_N
-            };
-
-            const res = await axios.post(
-                `${API}/api/ventas/devolverVenta/${ventaSelect}`,
-                payload,
+            result = await axios.put(
+                `${API}/api/ventas/compras-ventas/inactivar/${ventaSelect}`,
+                {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            if (res.data.ok) {
-                Swal.fire({
-                    title: 'Devolución generada correctamente',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
+            Swal.fire("OK", result.data.message, "success");
+            return;
+
+        } catch (error) {
+            const data = error?.response?.data;
+
+            // 3️⃣ Si hay hijos → segunda confirmación
+            if (data?.tieneReferencias) {
+
+                const force = await Swal.fire({
+                    title: "Existen devoluciones activas",
+                    text: "¿Deseas inactivar también los registros relacionados?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, forzar inactivación",
+                    cancelButtonText: "Cancelar"
                 });
-                // Recarga las ventas y limpia selección si quieres
-                buscarVentas();
-            } else {
-                Swal.fire('Error', res.data.mensaje, 'error');
+
+                if (!force.isConfirmed) return;
+
+                // 4️⃣ Reintento con forzar=true
+                const resultForce = await axios.put(
+                    `${API}/api/ventas/compras-ventas/inactivar/${ventaSelect}?forzar=true`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                Swal.fire("OK", resultForce.data.message, "success");
+                return;
             }
 
-        } catch (err) {
-            console.error(err);
-            Swal.fire('Error', 'Error al procesar la devolución', 'error');
+            throw error;
         }
-    };
 
-const totalIVA5 = itemsLista.reduce(
-  (acc, item) => acc + (item.impuesto_por === "5%" ? Number(item.impuesto || 0) : 0),
-  0
-);
-
-const totalIVA10 = itemsLista.reduce(
-  (acc, item) => acc + (item.impuesto_por === "10%" ? Number(item.impuesto || 0) : 0),
-  0
-);
-
-const totalGeneral = itemsLista.reduce(
-  (acc, item) => acc + Number(item.total || 0),
-  0
-);
-
-    const eliminarDetalle = (id_unico) => setItemsLista(prev => prev.filter(item => item.id_unico !== id_unico));
-    const eliminarDetallePago = (id_unico) => setItemsPago(prev => prev.filter(item => item.id_unico !== id_unico));
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "No se pudo inactivar", "error");
+    }
+};
 
     const activaRegistro = () => { setRegistro("active"); setMovimientos(""); setPagoVenta(""); };
     const activaMovimientos = () => { setMovimientos("active"); setRegistro(""); setPagoVenta(""); };
     const activaPagoVenta = () => { setPagoVenta("active"); setRegistro(""); setMovimientos(""); };
 
 
-    const imprimirPDF = async (idVenta, tipo) => {
-        try {
-            const token = localStorage.getItem("token");
 
-            const response = await axios.get(
-                `${API}/api/ventas/imprimir/${tipo}/${idVenta}`,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                    responseType: "blob", // importante para PDF
-                }
-            );
-
-            const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
-            window.open(url); // abre en nueva ventana para imprimir
-        } catch (err) {
-            console.error(err);
-            alert("No se pudo generar el PDF");
+    const factura = {
+        datosVentaImprimir,
+        totales: {
+            totalGeneral,
+            totalIVA10,
+            totalIVA5,
+            totalIVA: totalIVA10 + totalIVA5,
+            subTotal: totalGeneral - (totalIVA10 + totalIVA5)
         }
     };
+
+
     return (
         <div>
             <div className="mb-2">
@@ -261,18 +320,17 @@ const totalGeneral = itemsLista.reduce(
                 </div>
                 <div className="flex flex-wrap md:flex-nowrap gap-4 mb-4 px-6">
                     <button
-                        className="w-full md:w-40 p-2 rounded-md bg-blue-500 text-white font-semibold shadow hover:bg-blue-600"
-                        onClick={() => imprimirPDF(ventaSelect, "factura")}
+                        onClick={() => imprimirFactura(factura)}
+                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md"
                     >
+
                         Imprimir Factura
                     </button>
-
+                      <div className='flex justify-center items-center'>
                     <button
-                        className="w-full md:w-40 p-2 rounded-md bg-green-500 text-white font-semibold shadow hover:bg-green-600"
-                        onClick={() => imprimirPDF(ventaSelect, "nota_credito")}
-                    >
-                        Imprimir Nota de Crédito
-                    </button>
+                    disabled={!ventaSelect}
+                    onClick={()=>handleInactivar()} className="bg-red-500 disabled:opacity-50 disabled:cursor-no-drop text-white p-2 rounded-md font-semibold cursor-pointer hover:bg-red-600">Inactivar</button>
+                </div>
                 </div>
                 <div className="w-full">
                     <ModalVentas ventaSelect={ventaSelect} setVentaSelect={setVentaSelect} />

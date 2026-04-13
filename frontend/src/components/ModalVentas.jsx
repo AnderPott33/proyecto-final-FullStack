@@ -11,13 +11,13 @@ export default function ModalVentas({ ventaSelect, setVentaSelect }) {
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFin, setFechaFin] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
-
+const API = import.meta.env.VITE_API_URL;
     // 🔹 Cargar ventas
     const cargarVentas = async () => {
         try {
             const token = localStorage.getItem("token");
 
-            const { data } = await axios.get("https://owl-soft.onrender.com/api/ventas", {
+            const { data } = await axios.get(`${API}/api/ventas`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

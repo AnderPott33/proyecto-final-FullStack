@@ -8,7 +8,8 @@ export function CajaProvider({ children }) {
     const [loading, setLoading] = useState(false);
     const [token, setToken] = useState(localStorage.getItem("token"));
 
-    const API = "https://owl-soft.onrender.com";
+    const API = import.meta.env.VITE_API_URL;
+
 
     const obtenerCaja = async (customToken) => {
         const tokenToUse = customToken || token;

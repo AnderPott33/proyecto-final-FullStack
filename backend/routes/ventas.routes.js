@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { buscarVenta, buscarVentaId, buscarVentasYDevoluciones, crearVenta, devolverVenta, generarNuevaSeqVenta, imprimirVenta, inactivarCompraVenta } from '../controllers/ventas.controller.js';
+import { buscarVenta, buscarVentaId, buscarVentasYDevoluciones, crearVenta, devolverVenta, generarNuevaSeqVenta, inactivarCompraVenta } from '../controllers/ventas.controller.js';
 import { requireAuth } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -17,7 +17,6 @@ router.get('/marca/:marca_id',requireAuth, consultarStockMarcaId); */
 router.post('/nuevaVenta',requireAuth, crearVenta);
 router.post('/nuevaDevolucionVenta',requireAuth, devolverVenta);
 router.put('/compras-ventas/inactivar/:id',requireAuth, inactivarCompraVenta);
-router.get('/imprimir/:tipo/:id',requireAuth, imprimirVenta);
 
 
 export default router;

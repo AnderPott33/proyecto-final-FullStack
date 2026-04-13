@@ -34,6 +34,7 @@ import Timbrados from './pages/Timbrados';
 import { CotizacionProvider } from './context/CotizacionContext';
 import DevolucionCompra from './pages/DevolucionCompra';
 import DevolucionVenta from './pages/DevolucionVenta';
+import BalancePatrimonial from './pages/BalancePatrimonial'
 import SeleccionarPuntoExp from './pages/SeleccionarPunto';
 import Error from './pages/Error';
 import PerfilUsuario from './pages/Perfil';
@@ -64,6 +65,7 @@ function App() {
             <Route path="/cuenta/" element={<CuentasFinancieras />} />
             <Route path="/cuenta/informe/analitico" element={<AnaliticoCuenta />} />
             <Route path="/cuenta/informe/saldos" element={<SaldosCuentas />} />
+            <Route path="/cuenta/informe/balance" element={<BalancePatrimonial />} />
             {/* Movimientos */}
             <Route path="/movimientos" element={<MovimientosFinancieros />} />
             <Route path="/movimientos/recibeValores" element={<RecibeValores />} />

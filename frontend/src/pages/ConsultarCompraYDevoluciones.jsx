@@ -26,6 +26,7 @@ const tienePermiso = puedeAcceder("compra")
     const [ventas, setVentas] = useState([]);
     const [ventaSelect, setVentaSelect] = useState(null);
 
+
     const [formEncabezado, setFormEncabezado] = useState({
         tipo: '',
         estado: '',
@@ -174,6 +175,72 @@ const totalGeneral = itemsLista.reduce(
   0
 );
 
+
+const handleInactivar = async () => {
+    const token = localStorage.getItem('token');
+
+    try {
+        // 1️⃣ Confirmación inicial
+        const confirm = await Swal.fire({
+            title: "¿Inactivar registro?",
+            text: "Se cambiará el estado a INACTIVO",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, inactivar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        // 2️⃣ Primer intento (sin forzar)
+        let result;
+        try {
+            result = await axios.put(
+                `${API}/api/ventas/compras-ventas/inactivar/${ventaSelect}`,
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            Swal.fire("OK", result.data.message, "success");
+            return;
+
+        } catch (error) {
+            const data = error?.response?.data;
+
+            // 3️⃣ Si hay hijos → segunda confirmación
+            if (data?.tieneReferencias) {
+
+                const force = await Swal.fire({
+                    title: "Existen devoluciones activas",
+                    text: "¿Deseas inactivar también los registros relacionados?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, forzar inactivación",
+                    cancelButtonText: "Cancelar"
+                });
+
+                if (!force.isConfirmed) return;
+
+                // 4️⃣ Reintento con forzar=true
+                const resultForce = await axios.put(
+                    `${API}/api/ventas/compras-ventas/inactivar/${ventaSelect}?forzar=true`,
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                Swal.fire("OK", resultForce.data.message, "success");
+                return;
+            }
+
+            throw error;
+        }
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire("Error", "No se pudo inactivar", "error");
+    }
+};
+
     const eliminarDetalle = (id_unico) => setItemsLista(prev => prev.filter(item => item.id_unico !== id_unico));
     const eliminarDetallePago = (id_unico) => setItemsPago(prev => prev.filter(item => item.id_unico !== id_unico));
 
@@ -181,26 +248,6 @@ const totalGeneral = itemsLista.reduce(
     const activaMovimientos = () => { setMovimientos("active"); setRegistro(""); setPagoVenta(""); };
     const activaPagoVenta = () => { setPagoVenta("active"); setRegistro(""); setMovimientos(""); };
 
-
-    const imprimirPDF = async (idVenta, tipo) => {
-        try {
-            const token = localStorage.getItem("token");
-
-            const response = await axios.get(
-                `${API}/api/ventas/imprimir/${tipo}/${idVenta}`,
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                    responseType: "blob", // importante para PDF
-                }
-            );
-
-            const url = window.URL.createObjectURL(new Blob([response.data], { type: "application/pdf" }));
-            window.open(url); // abre en nueva ventana para imprimir
-        } catch (err) {
-            console.error(err);
-            alert("No se pudo generar el PDF");
-        }
-    };
     return (
         <div>
             <div className="mb-2">
@@ -234,21 +281,13 @@ const totalGeneral = itemsLista.reduce(
                         onChange={setVentaSelect}
                     />
                 </div>
-                <div className="flex flex-wrap md:flex-nowrap gap-4 mb-4 px-6">
-                    <button
-                        className="w-full md:w-40 p-2 rounded-md bg-blue-500 text-white font-semibold shadow hover:bg-blue-600"
-                        onClick={() => imprimirPDF(ventaSelect, "factura")}
-                    >
-                        Imprimir Factura
-                    </button>
 
-                   {/*  <button
-                        className="w-full md:w-40 p-2 rounded-md bg-green-500 text-white font-semibold shadow hover:bg-green-600"
-                        onClick={() => imprimirPDF(ventaSelect, "nota_credito")}
-                    >
-                        Imprimir Nota de Crédito
-                    </button> */}
+                <div className="flex justify-center items-center">
+                    <button
+                    disabled={!ventaSelect}
+                    onClick={()=>handleInactivar()} className="bg-red-500 disabled:opacity-50 disabled:cursor-no-drop text-white p-2 rounded-md font-semibold cursor-pointer hover:bg-red-600">Inactivar</button>
                 </div>
+                
                 <div className="w-full">
                     <ModalCompras ventaSelect={ventaSelect} setVentaSelect={setVentaSelect} />
                 </div>

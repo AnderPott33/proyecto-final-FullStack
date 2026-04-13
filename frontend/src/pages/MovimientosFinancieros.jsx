@@ -193,7 +193,7 @@ export default function MovimientosFinancieros() {
 
         return cumplePuntos && cumpleId && cumpleUsuario && cumpleEstado && cumpleFechaDesde && cumpleFechaHasta;
     });
-console.log(movimiento);
+
 
     return (
         <>

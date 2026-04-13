@@ -10,7 +10,7 @@ const BANDERAS = {
   PYG: pyFlag,
   BRL: brFlag,
 };
-
+const API = import.meta.env.VITE_API_URL;
 
 export default function CotizacionesForm() {
   const { mostrarModal, setMostrarModal } = useCotizacion();
@@ -65,7 +65,7 @@ export default function CotizacionesForm() {
       }
 
       await axios.post(
-        "https://owl-soft.onrender.com/api/cambio/actualizar",
+        `${API}/api/cambio/actualizar`,
         { cotizaciones: cotizacionesAGuardar },
         { headers: { Authorization: `Bearer ${token}` } }
       );

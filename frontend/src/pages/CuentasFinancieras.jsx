@@ -13,9 +13,9 @@ export default function CuentasFinancieras() {
   const API = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const { puedeAcceder, puede } = usePermiso();
-const tienePermiso = puedeAcceder("cuentas")
+  const tienePermiso = puedeAcceder("cuentas")
   useEffect(() => {
-        if (!tienePermiso) { navigate("/error-permiso"); }
+    if (!tienePermiso) { navigate("/error-permiso"); }
   }, [navigate, tienePermiso])
   if (!tienePermiso) return null;
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,8 @@ const tienePermiso = puedeAcceder("cuentas")
     sub_tipo: "",
     codigo: "",
     naturaleza: "",
+    tipo_contable: "",
+    cuenta_raiz: ""
   });
 
   const [busquedaId, setBusquedaId] = useState("");
@@ -79,6 +81,8 @@ const tienePermiso = puedeAcceder("cuentas")
       sub_tipo: "",
       codigo: "",
       naturaleza: "",
+      tipo_contable: "",
+      cuenta_raiz: ""
     });
     setMoneda("PYG");
     setEstadoC("ACTIVA");
@@ -100,6 +104,8 @@ const tienePermiso = puedeAcceder("cuentas")
       sub_tipo: cuenta.sub_tipo || "",
       naturaleza: cuenta.naturaleza || "",
       codigo: cuenta.codigo || "",
+      tipo_contable: cuenta.tipo_contable || "",
+      cuenta_raiz: cuenta.cuenta_raiz || ""
     });
     setMoneda(cuenta.moneda || "PYG");
     setTipo(cuenta.tipo || "BANCO");
@@ -148,6 +154,8 @@ const tienePermiso = puedeAcceder("cuentas")
         grupo: grupo,           // desde estado
         codigo: formData.codigo,
         naturaleza,            // desde estado
+        tipo_contable: formData.tipo_contable,
+        cuenta_raiz: formData.cuenta_raiz
       };
 
       const url = cuentaActiva
@@ -260,7 +268,7 @@ const tienePermiso = puedeAcceder("cuentas")
       {/* FILTROS */}
       <div className="flex flex-col gap-4 mb-2 bg-white p-4 rounded-md shadow-sm">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-4 w-full">
 
           <input type="number" placeholder="Buscar Id..." value={busquedaId}
             onChange={(e) => setBusquedaId(e.target.value)}
@@ -302,8 +310,6 @@ const tienePermiso = puedeAcceder("cuentas")
           >
             <FaPlusSquare /> Nuevo
           </button>
-        </div>
-
         <button
           onClick={() => {
             setBusquedaId("");
@@ -316,6 +322,8 @@ const tienePermiso = puedeAcceder("cuentas")
         >
           Limpiar filtros
         </button>
+        </div>
+
 
       </div>
 
@@ -325,9 +333,10 @@ const tienePermiso = puedeAcceder("cuentas")
           <div className="min-w-[1100px]">
             <DataTable
               data={cuentasFiltradas}
-              initialSort={{ column: "id", direction: "ascending" }}
+              initialSort={{ column: "codigo", direction: "ascending" }}
               columns={[
                 { header: "ID", accessor: "id", sortable: true },
+                { header: "Código", accessor: "codigo", sortable: true },
                 { header: "Nombre", accessor: "nombre", sortable: true },
                 { header: "Tipo", accessor: "tipo", sortable: true },
                 { header: "Sub-Tipo", accessor: "sub_tipo", sortable: true },
@@ -476,7 +485,7 @@ const tienePermiso = puedeAcceder("cuentas")
                 <label>
                   <span className="text-gray-700">Sub-Tipo</span>
                   <SelectCustom
-                    options={[{ value: "EFECTIVO", label: "EFECTIVO" }, { value: "BANCO", label: "BANCO" }, { value: "PATRIMONIO", label: "PATRIMONIO" }, { value: "INGRESO", label: "INGRESO" }, { value: "GASTO", label: "GASTO" }, { value: "OTROS", label: "OTROS" },]}
+                    options={[{ value: "EFECTIVO", label: "EFECTIVO" }, { value: "BANCO", label: "BANCO" }, { value: "PATRIMONIO", label: "PATRIMONIO" }, { value: "INGRESO", label: "INGRESO" }, { value: "GASTO", label: "GASTO" }, { value: "OTROS", label: "OTROS" }, { value: "CUENTA RAIZ", label: "CUENTA RAIZ" }]}
                     value={subTipo}
                     onChange={setSubTipo}
                   />
@@ -509,6 +518,30 @@ const tienePermiso = puedeAcceder("cuentas")
                     onChange={handleChange}
                     placeholder="Número de cuenta"
                     className="input w-full" />
+                </label>
+              </div>
+              {/* Fila 4 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label>
+                  <span className="text-gray-700">Cuenta Raiz</span>
+                  <SelectCustom
+                    options={cuentas.filter(c => c.tipo_contable === 'SINTÉTICA').map(e => (
+                      { value: e.id, label: e.nombre }
+                    ))}
+                    value={formData.cuenta_raiz}
+                    onChange={e => setFormData({ ...formData, cuenta_raiz: e })}
+                  />
+                </label>
+                <label>
+                  <span className="text-gray-700">Tipo Contable</span>
+                  <SelectCustom
+                    options={[
+                      { value: "SINTÉTICA", label: "SINTÉTICA" },
+                      { value: "ANALÍTICA", label: "ANALÍTICA" },
+                    ]}
+                    value={formData.tipo_contable}
+                    onChange={e => setFormData({ ...formData, tipo_contable: e })}
+                  />
                 </label>
               </div>
 

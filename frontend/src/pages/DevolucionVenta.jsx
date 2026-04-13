@@ -489,8 +489,10 @@ export default function DevolucionVenta() {
     useEffect(() => {
         if (formEncabezado.condicion_pago === "CRÉDITO") {
             // Definir forma de pago padrão para CRÉDITO
-            const formaCredito = listaFormaPago.find(f => f.id === 7); // id do crédito
-            const cuentaCredito = listaCuentas.find(c => c.id === 9); // id da conta padrão
+            const formaCredito = listaFormaPago.find(f => f.id === 8); // id do crédito
+            const cuentaCredito = listaCuentas.find(c => c.id === 8); // id da conta padrão
+
+
 
             setFormPago(prev => ({
                 ...prev,
@@ -551,6 +553,7 @@ export default function DevolucionVenta() {
                     );
 
                     const { encabezado, detalle, pagos } = result.data;
+
 
                     // ✅ 1. Completar encabezado
                     setFormEncabezado(prev => ({
@@ -708,7 +711,7 @@ export default function DevolucionVenta() {
                     Swal.fire("Error", "No se pudo registrar la nota de crédito", "error");
                 }
             } else {
-                Swal.fire("Atención", "No podes guardar la venta porque no tenes timbrado habilitado!", "error");
+                Swal.fire("Atención", "No podes guardar la Nota de Crédito porque no tenes timbrado habilitado!", "error");
             }
         } catch {
             Swal.fire("Error", "No se pudo registrar la nota de crédito", "error");
@@ -717,7 +720,6 @@ export default function DevolucionVenta() {
             setLoading(false)
         }
     };
-
 
     /* Activado de secciones */
     const activaRegistro = () => {
@@ -735,6 +737,7 @@ export default function DevolucionVenta() {
         setRegistro("");
         setMovimientos("");
     };
+
 
     return (
         <>

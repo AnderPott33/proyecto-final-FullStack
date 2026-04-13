@@ -474,13 +474,15 @@ export default function DevolucionCompra() {
                     const disponible = Number(ventaOriginal.total_detalle) - totalDevuelto;
 
                     if (totalGeneral > disponible) {
-                        Swal.fire(
-                            "Error",
-                            `El monto de la devolución (${formatearNumero(totalGeneral)}) excede lo disponible (${formatearNumero(disponible)})`,
-                            "error"
-                        );
-                        return; // 🔹 salir sin guardar
-                    }
+    Swal.fire({
+        title: "Error",
+        text: `El monto de la devolución (${formatearNumero(totalGeneral)}) excede lo disponible (${formatearNumero(disponible)})`,
+        icon: "error",
+        timer: 2000
+    });
+
+    return; // salir sin guardar
+}
                 }
             }
 

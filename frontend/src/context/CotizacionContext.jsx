@@ -9,14 +9,14 @@ export const useCotizacion = () => useContext(CotizacionContext);
 export const CotizacionProvider = ({ children }) => {
   const [mostrarModal, setMostrarModal] = useState(false);
   const location = useLocation();
-
+  const API = import.meta.env.VITE_API_URL;
   const verificarCotizacionHoy = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
 
       const res = await axios.get(
-        "https://owl-soft.onrender.com/api/cambio/existe-hoy",
+        `${API}/api/cambio/existe-hoy`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
